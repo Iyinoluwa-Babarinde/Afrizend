@@ -11,7 +11,7 @@ export const useJobsStore = create()(persist((set, get) => ({
     })),
     fundEscrow: async (jobId, employerId, freelancerId, amount, paymentCurrency = 'NGN', settlementCurrency = 'NGN') => {
         try {
-            const res = await fetch("http://localhost:5000/api/escrow/lock", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/escrow/lock`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
@@ -93,7 +93,7 @@ export const useJobsStore = create()(persist((set, get) => ({
         try {
             const job = get().jobs.find(j => j.id === jobId);
             const contractId = job.escrow.koraTxId || "mock_contract";
-            const res = await fetch("http://localhost:5000/api/escrow/payout", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/escrow/payout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ milestone_id: milestoneId, contract_id: contractId })
