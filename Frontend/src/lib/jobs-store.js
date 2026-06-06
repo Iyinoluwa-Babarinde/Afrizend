@@ -11,11 +11,11 @@ export const useJobsStore = create()(persist((set, get) => ({
     })),
     fundEscrow: async (jobId, employerId, freelancerId, amount, paymentCurrency = 'NGN', settlementCurrency = 'NGN') => {
         try {
-            const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://afrizend-backend.onrender.com/api" : "http://localhost:5000/api");
+            const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://afrizend.onrender.com/api" : "http://localhost:5000/api");
             const res = await fetch(`${API_BASE}/escrow/lock`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     job_id: jobId, employer_id: employerId, freelancer_id: freelancerId, agreed_amount: amount,
                     payment_currency: paymentCurrency, settlement_currency: settlementCurrency
                 })
@@ -94,14 +94,14 @@ export const useJobsStore = create()(persist((set, get) => ({
         try {
             const job = get().jobs.find(j => j.id === jobId);
             const contractId = job.escrow.koraTxId || "mock_contract";
-            const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://afrizend-backend.onrender.com/api" : "http://localhost:5000/api");
+            const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://afrizend.onrender.com/api" : "http://localhost:5000/api");
             const res = await fetch(`${API_BASE}/escrow/payout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ milestone_id: milestoneId, contract_id: contractId })
             });
             await res.json();
-            
+
             set((s) => ({
                 jobs: s.jobs.map((j) => {
                     if (j.id !== jobId)
