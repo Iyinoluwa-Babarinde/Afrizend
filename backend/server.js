@@ -38,7 +38,7 @@ const koraService = require('./services/koraService');
 
 const app = express();
 app.use(cors({
-  origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:5173'] : ['https://your-app.vercel.app', 'http://localhost:5173']
+  origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:5173'] : ['https://afrizend10.vercel.app', 'http://localhost:5173']
 }));
 app.use(express.json());
 
