@@ -8,7 +8,7 @@ services:
     startCommand: "cd backend && npm start"
     envVars:
       - key: DATABASE_URL
-        value: "postgres://YOUR_USERNAME:YOUR_PASSWORD@YOUR_HOST:5432/YOUR_DB_NAME"
+        sync: false
       - key: JWT_SECRET
         generateValue: true
 
