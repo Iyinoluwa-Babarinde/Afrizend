@@ -43,7 +43,9 @@ try {
     const schema = parsedUrl.searchParams.get('schema');
     if (schema) {
         pool.on('connect', (client) => {
-            client.query(`SET search_path TO "${schema}"`);
+            client.query(`SET search_path TO "${schema}"`).catch(err => {
+                console.error("Failed to set search_path:", err);
+            });
         });
     }
 } catch (e) {
