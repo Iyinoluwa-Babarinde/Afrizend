@@ -14,19 +14,6 @@ services:
       - key: JWT_SECRET
         generateValue: true
 
-  - type: web
-    name: afrizend-frontend
-    env: static
-    plan: free
-    region: ohio
-    buildCommand: "cd Frontend && npm install && npm run build"
-    staticPublishPath: "./Frontend/dist"
-    envVars:
-      - key: VITE_API_URL
-        # Update this URL in the Render dashboard after the backend is deployed 
-        # if it gets a different URL than the one predicted below.
-        value: "https://afrizend-backend.onrender.com/api"
-
 databases:
   - name: afrizend-db
     databaseName: afrizend
