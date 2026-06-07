@@ -11,9 +11,7 @@ const jwt = require('jsonwebtoken');
 // Prisma Configuration
 const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL
-});
+const prisma = new PrismaClient();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'afrizend-super-secret-key-2025';
 
