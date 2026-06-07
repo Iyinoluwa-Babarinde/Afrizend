@@ -1,5 +1,5 @@
 import { create } from "zustand";
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://afrizend-backend.onrender.com/api" : "http://localhost:5000/api");
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api");
 
 export const useAuthStore = create((set) => ({
     user: null,
@@ -61,13 +61,13 @@ export const useAuthStore = create((set) => ({
         }
     },
 
-    fundWallet: async (amount) => {
+    fundWallet: async (amount, cardDetails) => {
         const token = localStorage.getItem('afrizend_token');
         if (!token) return;
         const res = await fetch(`${API_URL}/wallet/fund`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ amount })
+            body: JSON.stringify({ amount, cardDetails })
         });
         if (!res.ok) {
             const data = await res.json().catch(()=>({}));
@@ -75,6 +75,7 @@ export const useAuthStore = create((set) => ({
         }
         const data = await res.json();
         set((state) => ({ user: { ...state.user, balance: data.balance } }));
+        return data;
     },
 
     withdrawWallet: async (amount) => {
@@ -91,30 +92,88 @@ export const useAuthStore = create((set) => ({
         }
         const data = await res.json();
         set((state) => ({ user: { ...state.user, balance: data.balance } }));
+        return data;
     },
 
-    issueVirtualWallet: async () => {
+    generateVirtualWallet: async () => {
         const token = localStorage.getItem('afrizend_token');
         if (!token) return;
         const res = await fetch(`${API_URL}/wallet/virtual`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) {
+            throw new Error('Failed to create virtual wallet');
+        }
+        const data = await res.json();
+        set((state) => ({ user: { ...state.user, virtual_account_number: data.account.account_number } }));
+        return data;
+    },
+
+    // Fetch real Kora wallet balance + transaction history
+    fetchKoraBalance: async () => {
+        const token = localStorage.getItem('afrizend_token');
+        if (!token) return null;
+        const res = await fetch(`${API_URL}/wallet/kora-balance`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        // Update local balance from DB
+        set((state) => ({ user: { ...state.user, balance: data.afrizendBalance, virtual_account_number: data.virtualAccount } }));
+        return data;
+    },
+
+    // Transfer milestone payment from employer to freelancer wallet
+    transferMilestonePayment: async ({ job_id, milestone_id, amount, freelancer_id }) => {
+        const token = localStorage.getItem('afrizend_token');
+        if (!token) throw new Error('Not authenticated');
+        const res = await fetch(`${API_URL}/escrow/transfer`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ job_id, milestone_id, amount, freelancer_id })
         });
         if (!res.ok) {
             const data = await res.json().catch(()=>({}));
-            throw new Error(data.error || 'Virtual wallet issuance failed');
+            throw new Error(data.error || 'Transfer failed');
         }
         const data = await res.json();
-        set((state) => ({ 
-            user: { 
-                ...state.user, 
-                virtual_account_number: data.account.account_number,
-                virtual_bank_name: data.account.bank_name,
-                virtual_account_reference: data.account.account_reference
-            } 
-        }));
-        return data.account;
-    }
+        // Update employer's local balance
+        set((state) => ({ user: { ...state.user, balance: data.employerNewBalance } }));
+        return data;
+    },
+
+    // Apply to a job (freelancer)
+    applyToJob: async (jobId, coverNote) => {
+        const token = localStorage.getItem('afrizend_token');
+        if (!token) throw new Error('Not authenticated');
+        const res = await fetch(`${API_URL}/jobs/${jobId}/apply`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ cover_note: coverNote })
+        });
+        if (!res.ok) {
+            const data = await res.json().catch(()=>({}));
+            throw new Error(data.error || 'Application failed');
+        }
+        return await res.json();
+    },
+
+    // Accept an applicant (employer)
+    acceptApplicant: async (jobId, freelancerId) => {
+        const token = localStorage.getItem('afrizend_token');
+        if (!token) throw new Error('Not authenticated');
+        const res = await fetch(`${API_URL}/jobs/${jobId}/accept-applicant`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ freelancer_id: freelancerId })
+        });
+        if (!res.ok) {
+            const data = await res.json().catch(()=>({}));
+            throw new Error(data.error || 'Accept failed');
+        }
+        return await res.json();
+    },
 }));
 
 export const useUIStore = create((set) => ({

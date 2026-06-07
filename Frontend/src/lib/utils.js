@@ -1,17 +1,22 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-
 export function cn(...inputs) {
     return twMerge(clsx(inputs));
 }
-
-export function formatCurrency(amount) {
-    return new Intl.NumberFormat("en-US", {
+export function formatCurrency(amount, currency = "NGN") {
+    const localeMap = {
+        "USD": "en-US",
+        "GBP": "en-GB",
+        "NGN": "en-NG",
+        "KES": "en-KE",
+        "GHS": "en-GH"
+    };
+    const locale = localeMap[currency] || "en-US";
+    return new Intl.NumberFormat(locale, {
         style: "currency",
-        currency: "USD",
+        currency: currency,
     }).format(amount);
 }
-
 export function formatDate(dateStr) {
     if (!dateStr)
         return "";
@@ -22,7 +27,6 @@ export function formatDate(dateStr) {
         year: "numeric",
     }).format(date);
 }
-
 export function formatRelativeTime(dateStr) {
     if (!dateStr)
         return "";
@@ -40,7 +44,6 @@ export function formatRelativeTime(dateStr) {
         return `in ${diffDays} days`;
     return `${Math.abs(diffDays)} days ago`;
 }
-
 export function formatDuration(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -50,7 +53,6 @@ export function formatDuration(seconds) {
     }
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
-
 export function getInitials(name) {
     if (!name)
         return "??";
@@ -60,7 +62,6 @@ export function getInitials(name) {
     }
     return (name.substring(0, 2)).toUpperCase();
 }
-
 export function verdictColor(status) {
     switch (status) {
         case "APPROVED": return "hsl(145 65% 50%)";

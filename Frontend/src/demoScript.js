@@ -23,7 +23,7 @@ const demoScript = [
   { type: 'click', selector: 'a[href="/dashboard/employer/jobs/new"]' },
   { type: 'wait', ms: 1000 },
   { type: 'type', selector: '#job-title', text: 'Senior React Engineer for Defi Dashboard' },
-  { type: 'type', selector: '#job-description', text: 'Build a decentralized dashboard using React and Tailwind. Must connect to Kora API for Escrow logic.' },
+  { type: 'type', selector: '#job-description', text: 'Build a decentralized dashboard using React and Tailwind. Must connect to Interledger testnet for Escrow logic.' },
   { type: 'type', selector: '#job-budget', text: '5000' },
   { type: 'type', selector: '#job-skills', text: 'React' },
   { type: 'click', selector: '#add-skill-btn' },
@@ -34,7 +34,7 @@ const demoScript = [
   { type: 'wait', ms: 1000 },
   { type: 'click', selector: '#final-post-btn' },
   { type: 'wait', ms: 2500 }, // Navigate to matches
- 
+
   // 4. Matches
   { type: 'click', selector: '.ai-match-card:first-child .hire-btn' },
   { type: 'wait', ms: 1500 },
@@ -44,7 +44,7 @@ const demoScript = [
   { type: 'click', selector: '#send-msg-btn' },
   { type: 'wait', ms: 1500 },
   { type: 'click', selector: '#lock-escrow-btn' },
-  { type: 'wait', ms: 3000 }, // Wait for Kora escrow API
+  { type: 'wait', ms: 3000 }, // Wait for ILP escrow API
   
   // 6. Switch to Freelancer & Submit (Simulated via navigation for demo)
   { type: 'navigate', path: '/dashboard/freelancer/contracts' },
@@ -54,18 +54,14 @@ const demoScript = [
   { type: 'type', selector: '#deliverable-url', text: 'https://github.com/freelancer/afrizend-defi-mvp' },
   { type: 'click', selector: '#submit-deliverable-btn' },
   { type: 'wait', ms: 3000 }, // Wait for AI Verification
- 
+
   // 7. Employer Review & Approve
   { type: 'navigate', path: '/dashboard/employer/contracts' },
   { type: 'wait', ms: 1500 },
   { type: 'click', selector: '.review-submission-btn' },
   { type: 'wait', ms: 2000 }, // Read AI report
-  { type: 'click', selector: '#approve-payout-btn' },
-  { type: 'wait', ms: 3000 }, // Wait for Instant Payout API
   
-  // 8. Download Access
-  { type: 'click', selector: '#download-deliverable-btn' },
-  { type: 'wait', ms: 2000 },
+  // The script stops here so the employer can manually click "Approve & Release"
 ];
 
 export default demoScript;

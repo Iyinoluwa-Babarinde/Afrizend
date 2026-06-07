@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: afrizend-backend
+    env: node
+    plan: free
+    region: ohio
+    buildCommand: "cd backend && npm install && npm run build"
+    startCommand: "cd backend && npm start"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: afrizend-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+  - type: web
+    name: afrizend-frontend
+    env: static
+    plan: free
+    region: ohio
+    buildCommand: "cd Frontend && npm install && npm run build"
+    staticPublishPath: "./Frontend/dist"
+    envVars:
+      - key: VITE_API_URL
+        # Update this URL in the Render dashboard after the backend is deployed 
+        # if it gets a different URL than the one predicted below.
+        value: "https://afrizend-backend.onrender.com/api"
+
+databases:
+  - name: afrizend-db
+    databaseName: afrizend
+    user: afrizend_user
+    plan: free
+    region: ohio

@@ -45,8 +45,8 @@ export default function EmployerSessionsPage() {
     return (<div style={{ padding: "1.5rem", maxWidth: 1100, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem" }}>
         <div>
-          <h1 className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "white" }}>Consultation Sessions</h1>
-          <p style={{ color: "hsl(220 15% 55%)", fontSize: "0.875rem", marginTop: 4 }}>Pay-per-minute advisory calls via Web Monetization</p>
+          <h1 className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "hsl(var(--text))" }}>Consultation Sessions</h1>
+          <p style={{ color: "hsl(var(--text-2))", fontSize: "0.875rem", marginTop: 4 }}>Pay-per-minute advisory calls via Web Monetization</p>
         </div>
         <button className="btn btn-primary" onClick={() => { setSelectedConsultant(null); setIsBookingOpen(true); }}>
           Find a Consultant
@@ -57,7 +57,7 @@ export default function EmployerSessionsPage() {
         
         {/* Sessions List */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <h2 className="font-heading" style={{ fontSize: "1.2rem", fontWeight: 700, color: "white" }}>Your Sessions</h2>
+          <h2 className="font-heading" style={{ fontSize: "1.2rem", fontWeight: 700, color: "hsl(var(--text))" }}>Your Sessions</h2>
           
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {sessions.map(session => (<div key={session.id} className="card card-hover" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -67,8 +67,8 @@ export default function EmployerSessionsPage() {
                       {session.freelancer.name?.split(" ").map((n) => n[0]).join("") || "C"}
                     </div>
                     <div>
-                      <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "white", marginBottom: "0.2rem" }}>{session.freelancer.name}</h3>
-                      <div style={{ fontSize: "0.8rem", color: "hsl(220 15% 65%)" }}>{session.freelancer.title}</div>
+                      <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))", marginBottom: "0.2rem" }}>{session.freelancer.name}</h3>
+                      <div style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))" }}>{session.freelancer.title}</div>
                     </div>
                   </div>
                   <div className={`badge ${session.status === "SCHEDULED" || session.status === "UPCOMING" ? "badge-cyan" : "badge-ghost"}`}>
@@ -76,20 +76,20 @@ export default function EmployerSessionsPage() {
                   </div>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", padding: "1rem", background: "hsl(220 20% 10%)", borderRadius: 8, border: "1px solid hsl(220 20% 16%)" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", padding: "1rem", background: "hsl(var(--surface-3))", borderRadius: 8, border: "1px solid hsl(var(--border))" }}>
                   <div>
-                    <div style={{ fontSize: "0.7rem", color: "hsl(220 15% 55%)", marginBottom: 4, display: "flex", alignItems: "center", gap: "0.3rem" }}><Calendar size={12}/> Date & Time</div>
-                    <div style={{ fontSize: "0.85rem", color: "white", fontWeight: 600 }}>{formatDate(session.date)}</div>
+                    <div style={{ fontSize: "0.7rem", color: "hsl(var(--text-2))", marginBottom: 4, display: "flex", alignItems: "center", gap: "0.3rem" }}><Calendar size={12}/> Date & Time</div>
+                    <div style={{ fontSize: "0.85rem", color: "hsl(var(--text))", fontWeight: 600 }}>{formatDate(session.date)}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: "0.7rem", color: "hsl(220 15% 55%)", marginBottom: 4, display: "flex", alignItems: "center", gap: "0.3rem" }}><DollarSign size={12}/> Rate</div>
-                    <div style={{ fontSize: "0.85rem", color: "white", fontWeight: 600 }}>{formatCurrency(session.freelancer.ratePerMinute)} / min</div>
+                    <div style={{ fontSize: "0.7rem", color: "hsl(var(--text-2))", marginBottom: 4, display: "flex", alignItems: "center", gap: "0.3rem" }}><DollarSign size={12}/> Rate</div>
+                    <div style={{ fontSize: "0.85rem", color: "hsl(var(--text))", fontWeight: 600 }}>{formatCurrency(session.freelancer.ratePerMinute)} / min</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: "0.7rem", color: "hsl(220 15% 55%)", marginBottom: 4, display: "flex", alignItems: "center", gap: "0.3rem" }}><Clock size={12}/> Duration & Cost</div>
-                    <div style={{ fontSize: "0.85rem", color: "white", fontWeight: 600 }}>
+                    <div style={{ fontSize: "0.7rem", color: "hsl(var(--text-2))", marginBottom: 4, display: "flex", alignItems: "center", gap: "0.3rem" }}><Clock size={12}/> Duration & Cost</div>
+                    <div style={{ fontSize: "0.85rem", color: "hsl(var(--text))", fontWeight: 600 }}>
                       {session.duration ? `${session.duration} min` : "TBD"}
-                      {session.totalCharged && <span style={{ color: "hsl(220 15% 55%)", marginLeft: "0.5rem", fontWeight: 400 }}>({formatCurrency(session.totalCharged)})</span>}
+                      {session.totalCharged && <span style={{ color: "hsl(var(--text-2))", marginLeft: "0.5rem", fontWeight: 400 }}>({formatCurrency(session.totalCharged)})</span>}
                     </div>
                   </div>
                 </div>
@@ -108,24 +108,24 @@ export default function EmployerSessionsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           
           <div className="card" style={{ background: "linear-gradient(135deg, hsl(200 100% 60% / 0.1), transparent)", borderColor: "hsl(200 100% 60% / 0.2)" }}>
-            <h3 className="font-heading" style={{ fontSize: "1rem", color: "white", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <h3 className="font-heading" style={{ fontSize: "1rem", color: "hsl(var(--text))", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <DollarSign size={16} color="hsl(200 100% 65%)"/> How it Works
             </h3>
-            <p style={{ fontSize: "0.8rem", color: "hsl(220 15% 65%)", lineHeight: 1.6, marginBottom: "1rem" }}>
+            <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))", lineHeight: 1.6, marginBottom: "1rem" }}>
               When you join a session, you pre-authorize a maximum budget via Open Payments. Funds are streamed to the consultant <strong>per-second</strong>. If you end early, unspent funds are instantly released.
             </p>
           </div>
 
           <div className="card">
-            <h3 className="font-heading" style={{ fontSize: "1rem", color: "white", marginBottom: "1rem" }}>Recommended Consultants</h3>
+            <h3 className="font-heading" style={{ fontSize: "1rem", color: "hsl(var(--text))", marginBottom: "1rem" }}>Recommended Consultants</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               {DEMO_CONSULTANTS.slice(0, 3).map(c => (<div key={c.id} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                   <div className="avatar" style={{ width: 32, height: 32, fontSize: "0.7rem", borderRadius: 8 }}>
                     {c.name?.split(" ").map((n) => n[0]).join("") || "C"}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "white", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.name}</div>
-                    <div style={{ fontSize: "0.75rem", color: "hsl(220 15% 55%)" }}>{formatCurrency(c.ratePerMinute)} / min</div>
+                    <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "hsl(var(--text))", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.name}</div>
+                    <div style={{ fontSize: "0.75rem", color: "hsl(var(--text-2))" }}>{formatCurrency(c.ratePerMinute)} / min</div>
                   </div>
                   <button onClick={() => handleBook(c)} className="btn btn-ghost btn-sm" style={{ padding: "0.3rem 0.5rem" }}>
                     <ArrowRight size={14}/>
@@ -140,29 +140,29 @@ export default function EmployerSessionsPage() {
       {/* Booking Form Modal */}
       {isBookingOpen && selectedConsultant && (<div style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
           <div className="card glass-strong" style={{ width: "100%", maxWidth: 450, padding: "2rem", position: "relative" }}>
-            <button onClick={() => setIsBookingOpen(false)} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", color: "hsl(220 15% 55%)" }}>
+            <button onClick={() => setIsBookingOpen(false)} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", color: "hsl(var(--text-2))" }}>
               <X size={20}/>
             </button>
-            <h3 className="font-heading" style={{ fontSize: "1.25rem", color: "white", marginBottom: "1rem" }}>Book Advisory Call</h3>
+            <h3 className="font-heading" style={{ fontSize: "1.25rem", color: "hsl(var(--text))", marginBottom: "1rem" }}>Book Advisory Call</h3>
             
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem", padding: "0.75rem", borderRadius: 8, background: "hsl(220 20% 10%)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem", padding: "0.75rem", borderRadius: 8, background: "hsl(var(--surface-3))" }}>
               <div className="avatar" style={{ width: 40, height: 40, fontSize: "0.8rem", borderRadius: 8 }}>
                 {selectedConsultant.name?.split(" ").map((n) => n[0]).join("") || "C"}
               </div>
               <div>
-                <div style={{ fontWeight: 700, color: "white", fontSize: "0.9rem" }}>{selectedConsultant.name}</div>
-                <div style={{ fontSize: "0.75rem", color: "hsl(220 15% 55%)" }}>{selectedConsultant.title}</div>
+                <div style={{ fontWeight: 700, color: "hsl(var(--text))", fontSize: "0.9rem" }}>{selectedConsultant.name}</div>
+                <div style={{ fontSize: "0.75rem", color: "hsl(var(--text-2))" }}>{selectedConsultant.title}</div>
               </div>
             </div>
             
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Date & Time</label>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Date & Time</label>
                 <input className="input" type="datetime-local" value={bookingDate} onChange={e => setBookingDate(e.target.value)} required/>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Duration (Minutes)</label>
-                <select className="input" value={bookingDuration} onChange={e => setBookingDuration(e.target.value)} style={{ background: "hsl(220 16% 12%)" }}>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Duration (Minutes)</label>
+                <select className="input" value={bookingDuration} onChange={e => setBookingDuration(e.target.value)} style={{ background: "hsl(var(--surface-3))" }}>
                   <option value="15">15 Minutes ({formatCurrency(selectedConsultant.ratePerMinute * 15)})</option>
                   <option value="30">30 Minutes ({formatCurrency(selectedConsultant.ratePerMinute * 30)})</option>
                   <option value="60">60 Minutes ({formatCurrency(selectedConsultant.ratePerMinute * 60)})</option>
@@ -180,21 +180,21 @@ export default function EmployerSessionsPage() {
       {/* Select Consultant Search Modal */}
       {isBookingOpen && !selectedConsultant && (<div style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
           <div className="card glass-strong" style={{ width: "100%", maxWidth: 500, maxHeight: "80vh", overflowY: "auto", padding: "2rem", position: "relative" }}>
-            <button onClick={() => setIsBookingOpen(false)} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", color: "hsl(220 15% 55%)" }}>
+            <button onClick={() => setIsBookingOpen(false)} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", color: "hsl(var(--text-2))" }}>
               <X size={20}/>
             </button>
-            <h3 className="font-heading" style={{ fontSize: "1.25rem", color: "white", marginBottom: "1rem" }}>Select a Consultant</h3>
+            <h3 className="font-heading" style={{ fontSize: "1.25rem", color: "hsl(var(--text))", marginBottom: "1rem" }}>Select a Consultant</h3>
             
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
-              {DEMO_CONSULTANTS.map(c => (<div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", padding: "0.75rem", borderRadius: 8, background: "hsl(220 20% 10%)", border: "1px solid hsl(220 20% 16%)" }}>
+              {DEMO_CONSULTANTS.map(c => (<div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", padding: "0.75rem", borderRadius: 8, background: "hsl(var(--surface-3))", border: "1px solid hsl(var(--border))" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                     <div className="avatar" style={{ width: 40, height: 40, fontSize: "0.8rem", borderRadius: 8 }}>
                       {c.name?.split(" ").map((n) => n[0]).join("") || "C"}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, color: "white", fontSize: "0.9rem" }}>{c.name}</div>
-                      <div style={{ fontSize: "0.75rem", color: "hsl(220 15% 55%)" }}>{c.title}</div>
-                      <div style={{ fontSize: "0.72rem", color: "hsl(145 65% 50%)" }}>{formatCurrency(c.ratePerMinute)} / min</div>
+                      <div style={{ fontWeight: 700, color: "hsl(var(--text))", fontSize: "0.9rem" }}>{c.name}</div>
+                      <div style={{ fontSize: "0.75rem", color: "hsl(var(--text-2))" }}>{c.title}</div>
+                      <div style={{ fontSize: "0.72rem", color: "hsl(var(--success))" }}>{formatCurrency(c.ratePerMinute)} / min</div>
                     </div>
                   </div>
                   <button className="btn btn-primary btn-sm" onClick={() => setSelectedConsultant(c)}>Book</button>

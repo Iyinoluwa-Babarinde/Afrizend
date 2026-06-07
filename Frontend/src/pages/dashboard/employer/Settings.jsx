@@ -10,7 +10,7 @@ export default function EmployerSettings() {
     const [profileName, setProfileName] = useState(user?.name || "Sarah Chen");
     const [companyName, setCompanyName] = useState("Acme Labs");
     const [emailAddress, setEmailAddress] = useState("sarah@acmelabs.io");
-    const [walletPointer, setWalletPointer] = useState(user?.walletAddress || "$kora.interledger-test.dev/sarah");
+    const [walletPointer, setWalletPointer] = useState(user?.walletAddress || "$ilp.interledger-test.dev/sarah");
     const [isSaved, setIsSaved] = useState(false);
     const [fundAmount, setFundAmount] = useState("");
     const [showFundModal, setShowFundModal] = useState(false);
@@ -46,8 +46,8 @@ export default function EmployerSettings() {
     return (<div style={{ padding: "1.5rem", maxWidth: 900, margin: "0 auto" }}>
       {/* Header */}
       <div style={{ marginBottom: "2rem" }}>
-        <h1 className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "white" }}>Settings</h1>
-        <p style={{ color: "hsl(220 15% 55%)", fontSize: "0.875rem", marginTop: 4 }}>
+        <h1 className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "hsl(var(--text))" }}>Settings</h1>
+        <p style={{ color: "hsl(var(--text-2))", fontSize: "0.875rem", marginTop: 4 }}>
           Manage your Afrizend workspace settings, billing accounts, and digital identities
         </p>
       </div>
@@ -78,28 +78,28 @@ export default function EmployerSettings() {
         <div className="card" style={{ padding: "2rem" }}>
           {/* PROFILE TAB */}
           {activeTab === "profile" && (<form onSubmit={handleSaveProfile} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h2 className="font-heading" style={{ fontSize: "1.2rem", color: "white", marginBottom: "0.5rem" }}>Profile Details</h2>
+              <h2 className="font-heading" style={{ fontSize: "1.2rem", color: "hsl(var(--text))", marginBottom: "0.5rem" }}>Profile Details</h2>
               
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Full Name</label>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Full Name</label>
                 <input className="input" value={profileName} onChange={e => setProfileName(e.target.value)} required/>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Company Name</label>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Company Name</label>
                 <input className="input" value={companyName} onChange={e => setCompanyName(e.target.value)} required/>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Email Address</label>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Email Address</label>
                 <input className="input" type="email" value={emailAddress} onChange={e => setEmailAddress(e.target.value)} required/>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem", borderTop: "1px solid hsl(220 20% 16%)", paddingTop: "1.25rem", marginTop: "0.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem", borderTop: "1px solid hsl(var(--border))", paddingTop: "1.25rem", marginTop: "0.5rem" }}>
                 <button type="submit" className="btn btn-primary" style={{ minWidth: 120 }}>
                   Save Changes
                 </button>
-                {isSaved && (<span style={{ fontSize: "0.8rem", color: "hsl(145 65% 50%)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                {isSaved && (<span style={{ fontSize: "0.8rem", color: "hsl(var(--success))", display: "flex", alignItems: "center", gap: "0.25rem" }}>
                     <Check size={14}/> Profile updated successfully
                   </span>)}
               </div>
@@ -108,20 +108,20 @@ export default function EmployerSettings() {
           {/* PAYMENTS & ESCROW TAB */}
           {activeTab === "payments" && (<div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               <div>
-                <h2 className="font-heading" style={{ fontSize: "1.2rem", color: "white", marginBottom: "0.5rem" }}>Payments & Escrow</h2>
-                <p style={{ fontSize: "0.8rem", color: "hsl(220 15% 55%)" }}>Configure your Kora Protocol wallet pointer and manage funded employer deposits.</p>
+                <h2 className="font-heading" style={{ fontSize: "1.2rem", color: "hsl(var(--text))", marginBottom: "0.5rem" }}>Payments & Escrow</h2>
+                <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))" }}>Configure your Interledger Protocol wallet pointer and manage funded employer deposits.</p>
               </div>
 
               {/* Wallet Info Card */}
-              <div style={{ background: "hsl(220 20% 10%)", border: "1px solid hsl(220 20% 16%)", borderRadius: 8, padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+              <div style={{ background: "hsl(var(--surface-3))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 10, background: "hsl(217 91% 55% / 0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 10, background: "hsl(var(--primary) / 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Wallet size={20} color="hsl(217 91% 65%)"/>
                   </div>
                   <div>
-                    <div style={{ fontSize: "0.72rem", color: "hsl(220 15% 50%)", textTransform: "uppercase" }}>Wallet Balance</div>
-                    <div className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", marginTop: 2 }}>
-                      {formatCurrency(user?.balance || 0)}
+                    <div style={{ fontSize: "0.72rem", color: "hsl(var(--text-2))", textTransform: "uppercase" }}>Wallet Balance</div>
+                    <div className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "hsl(var(--text))", marginTop: 2 }}>
+                      {formatCurrency(user?.balance || 0, user?.currency || "USD")}
                     </div>
                   </div>
                 </div>
@@ -134,9 +134,9 @@ export default function EmployerSettings() {
               {/* Wallet Pointer input */}
               <form onSubmit={handleSaveProfile} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 <div>
-                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Kora Payment Pointer</label>
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>ILP Payment Pointer</label>
                   <input className="input" value={walletPointer} onChange={e => setWalletPointer(e.target.value)} required/>
-                  <p style={{ fontSize: "0.72rem", color: "hsl(220 15% 45%)", marginTop: "0.35rem" }}>
+                  <p style={{ fontSize: "0.72rem", color: "hsl(var(--text-3))", marginTop: "0.35rem" }}>
                     Funds from contract closures will be settled directly to this pointer address.
                   </p>
                 </div>
@@ -149,32 +149,32 @@ export default function EmployerSettings() {
           {/* SECURITY & KEYS TAB */}
           {activeTab === "security" && (<div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               <div>
-                <h2 className="font-heading" style={{ fontSize: "1.2rem", color: "white", marginBottom: "0.5rem" }}>Security & Identity Keys</h2>
-                <p style={{ fontSize: "0.8rem", color: "hsl(220 15% 55%)" }}>Configure Web Monetization keys and multi-factor verification settings.</p>
+                <h2 className="font-heading" style={{ fontSize: "1.2rem", color: "hsl(var(--text))", marginBottom: "0.5rem" }}>Security & Identity Keys</h2>
+                <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))" }}>Configure Web Monetization keys and multi-factor verification settings.</p>
               </div>
 
               {/* Digital signature mock key */}
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Web Monetization Public Key</label>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Web Monetization Public Key</label>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <input className="input" style={{ fontFamily: "monospace", fontSize: "0.78rem" }} value="ed25519_pub_7a2f9b8c6e4d5a1b2c3d4e5f6a7b8c9d0e1f" readOnly/>
                 </div>
               </div>
 
               {/* Security settings checklist */}
-              <div style={{ borderTop: "1px solid hsl(220 20% 16%)", paddingTop: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{ borderTop: "1px solid hsl(var(--border))", paddingTop: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
                   <div>
-                    <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "white" }}>Stream Settlement Notifications</div>
-                    <div style={{ fontSize: "0.78rem", color: "hsl(220 15% 55%)" }}>Receive real-time emails when milestones are released.</div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "hsl(var(--text))" }}>Stream Settlement Notifications</div>
+                    <div style={{ fontSize: "0.78rem", color: "hsl(var(--text-2))" }}>Receive real-time emails when milestones are released.</div>
                   </div>
                   <input type="checkbox" checked={streamAlerts} onChange={() => setStreamAlerts(!streamAlerts)} style={{ width: 18, height: 18, cursor: "pointer" }}/>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
                   <div>
-                    <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "white" }}>Two-Factor Authorization (2FA)</div>
-                    <div style={{ fontSize: "0.78rem", color: "hsl(220 15% 55%)" }}>Require key confirmation before releasing escrow milestones.</div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "hsl(var(--text))" }}>Two-Factor Authorization (2FA)</div>
+                    <div style={{ fontSize: "0.78rem", color: "hsl(var(--text-2))" }}>Require key confirmation before releasing escrow milestones.</div>
                   </div>
                   <input type="checkbox" checked={twoFactor} onChange={() => setTwoFactor(!twoFactor)} style={{ width: 18, height: 18, cursor: "pointer" }}/>
                 </div>
@@ -186,15 +186,15 @@ export default function EmployerSettings() {
       {/* Funding Modal Dialog */}
       {showFundModal && (<div style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
           <div className="card glass-strong" style={{ width: "100%", maxWidth: 400, padding: "2rem", position: "relative" }}>
-            <h3 className="font-heading" style={{ fontSize: "1.25rem", color: "white", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <h3 className="font-heading" style={{ fontSize: "1.25rem", color: "hsl(var(--text))", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <Plus size={20} color="hsl(217 91% 65%)"/> Fund Wallet Balance
             </h3>
-            <p style={{ fontSize: "0.8rem", color: "hsl(220 15% 55%)", marginBottom: "1.25rem" }}>
-              Deposit funds from your external bank account or Kora-enabled wallet into your Afrizend escrow budget.
+            <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))", marginBottom: "1.25rem" }}>
+              Deposit funds from your external bank account or ILP-enabled wallet into your Afrizend escrow budget.
             </p>
 
             <div style={{ marginBottom: "1.5rem" }}>
-              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(220 15% 65%)", marginBottom: "0.4rem" }}>Deposit Amount (USD)</label>
+              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Deposit Amount (USD)</label>
               <div style={{ position: "relative" }}>
                 <DollarSign size={16} color="hsl(220 15% 55%)" style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)" }}/>
                 <input className="input" type="number" placeholder="e.g. 5000" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} style={{ paddingLeft: "1.75rem" }} required/>

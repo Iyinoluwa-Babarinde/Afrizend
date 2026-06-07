@@ -1,18 +1,20 @@
 "use client";
 import { useNavigate, useParams } from "react-router-dom";
 import { useJobsStore } from "@/lib/jobs-store";
+import { useAuthStore } from "@/lib/store";
 import { Lock, CheckCircle, AlertTriangle, Zap, Shield, ArrowLeft, Download, Play, Loader2, Eye, FileText } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api");
 function formatCurrency(n) {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 }
 function StatusBadge({ status }) {
     const map = {
-        LOCKED: { bg: "hsl(220 16% 14%)", color: "hsl(220 15% 45%)", label: "Locked" },
-        IN_PROGRESS: { bg: "hsl(217 91% 55% / 0.12)", color: "hsl(217 91% 70%)", label: "In Progress" },
+        LOCKED: { bg: "hsl(220 16% 14%)", color: "hsl(var(--text-3))", label: "Locked" },
+        IN_PROGRESS: { bg: "hsl(217 91% 55% / 0.12)", color: "hsl(var(--primary-dark))", label: "In Progress" },
         SUBMITTED: { bg: "hsl(38 92% 50% / 0.12)", color: "hsl(38 92% 65%)", label: "Submitted" },
         UNDER_REVIEW: { bg: "hsl(38 92% 50% / 0.12)", color: "hsl(38 92% 65%)", label: "Under Review" },
-        APPROVED: { bg: "hsl(145 65% 42% / 0.12)", color: "hsl(145 65% 55%)", label: "Approved ✓" },
+        APPROVED: { bg: "hsl(145 65% 42% / 0.12)", color: "hsl(var(--success))", label: "AI Verified - Pending Employer Approval" },
         NEEDS_REVISION: { bg: "hsl(0 84% 60% / 0.1)", color: "hsl(0 84% 70%)", label: "Needs Revision" },
         ESCALATED: { bg: "hsl(38 92% 50% / 0.12)", color: "hsl(38 92% 65%)", label: "Escalated" },
     };
@@ -29,14 +31,62 @@ export default function ContractPage() {
     const releasePay = useJobsStore((s) => s.releaseMilestonePayment);
     const unlockDownload = useJobsStore((s) => s.unlockDownload);
     const fundEscrow = useJobsStore((s) => s.fundEscrow);
+    const transferMilestonePayment = useAuthStore((s) => s.transferMilestonePayment);
+    const user = useAuthStore((s) => s.user);
     const [releasing, setReleasing] = useState(null);
-    const [isFunding, setIsFunding] = useState(false);
-    const [paymentCurrency, setPaymentCurrency] = useState('NGN');
+    const [releaseError, setReleaseError] = useState(null);
     const [expandedVerdict, setExpandedVerdict] = useState(null);
     const [chatInput, setChatInput] = useState("");
     const [chatMessages, setChatMessages] = useState([
         { sender: job?.freelancerName || "Freelancer", text: "Hi! Thanks for hiring me. I'm ready to get started. Can we review and lock the escrow budget?" }
     ]);
+
+    // Fetch backend job + live milestone statuses (survives page refresh)
+    const [backendJob, setBackendJob] = useState(null);
+    const [backendMilestones, setBackendMilestones] = useState([]);
+    const [paidSuccess, setPaidSuccess] = useState(null); // { milestoneId, freelancerBalance }
+
+    const updateJob = useJobsStore((s) => s.updateJob);
+
+    const loadBackendJob = () => {
+        if (!params.id) return;
+        fetch(`${API_URL}/jobs/${params.id}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.id) {
+                    setBackendJob(data);
+                    setBackendMilestones(data.milestones || []);
+                    
+                    // Sync the core fields to local store so the UI updates
+                    updateJob(data.id, {
+                        status: data.status === 'in_progress' ? 'IN_PROGRESS' : data.status === 'open' ? 'OPEN' : data.status === 'completed' ? 'COMPLETED' : 'OPEN',
+                        freelancerId: data.freelancer_id,
+                        freelancerName: data.freelancer_name || 'Freelancer',
+                        milestones: (data.milestones || []).map((m, i) => {
+                            // Find existing local milestone to preserve UI-only state like verificationResult
+                            const localM = useJobsStore.getState().jobs.find(j => j.id === params.id)?.milestones?.find(lm => lm.id === m.id) || {};
+                            const s = (m.status || '').toLowerCase();
+                            const mappedStatus = s === 'in_progress' ? 'IN_PROGRESS' : s === 'submitted' || s === 'under_review' ? 'UNDER_REVIEW' : s === 'paid' ? 'PAID' : s === 'approved' ? 'APPROVED' : i === 0 ? 'IN_PROGRESS' : 'LOCKED';
+                            
+                            return {
+                                id: m.id,
+                                title: m.title,
+                                description: m.description,
+                                amount: m.amount,
+                                deliverables: (() => { try { return JSON.parse(m.deliverables); } catch(_) { return []; } })(),
+                                acceptanceCriteria: m.acceptance_criteria || '',
+                                status: mappedStatus,
+                                verificationResult: localM.verificationResult,
+                                paidAt: localM.paidAt || (s === 'paid' ? new Date().toISOString() : null)
+                            };
+                        })
+                    });
+                }
+            })
+            .catch(() => {});
+    };
+
+    useEffect(() => { loadBackendJob(); }, [params.id]);
 
     function handleSendChat() {
         if (!chatInput.trim()) return;
@@ -46,76 +96,125 @@ export default function ContractPage() {
 
     if (!job) {
         return (<div style={{ padding: "3rem", textAlign: "center" }}>
-        <p style={{ color: "hsl(220 15% 55%)" }}>Contract not found.</p>
+        <p style={{ color: "hsl(var(--text-2))" }}>Contract not found.</p>
         <button onClick={() => navigate("/dashboard/employer/jobs")} className="btn btn-primary" style={{ marginTop: "1rem" }}>Back to Jobs</button>
       </div>);
     }
-    const pct = Math.round((job.escrow.released / job.escrow.total) * 100);
     async function handleRelease(milestoneId, amount) {
-        if (!job)
-            return;
+        if (!job) return;
         setReleasing(milestoneId);
-        await releasePay(job.id, milestoneId);
-        // Check if all milestones approved → unlock download
-        const updatedJob = useJobsStore.getState().jobs.find(j => j.id === job.id);
-        const allDone = updatedJob.milestones.filter((m) => m.id !== milestoneId).every((m) => m.status === "APPROVED");
-        if (allDone) {
-            unlockDownload(job.id, ["final_deliverable.zip", "source_code.zip", "documentation.pdf"]);
+        setReleaseError(null);
+        setPaidSuccess(null);
+        try {
+            const freelancerId = backendJob?.freelancer_id || job.freelancerId;
+            if (!freelancerId) throw new Error('Freelancer not found on this contract. Try refreshing the page.');
+
+            // 1. Execute the real transfer — credits freelancer balance in DB
+            const result = await transferMilestonePayment({
+                job_id: job.id,
+                milestone_id: milestoneId,
+                amount,
+                freelancer_id: freelancerId
+            });
+
+            // 2. The transfer API automatically marks the milestone as 'paid' in the backend DB.
+
+
+            // 3. Fetch the freelancer's new balance to show confirmation
+            let freelancerNewBalance = null;
+            try {
+                const balRes = await fetch(`${API_URL}/users/${freelancerId}/balance`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (balRes.ok) { const bd = await balRes.json(); freelancerNewBalance = bd.balance; }
+            } catch(_) {}
+
+            // 4. Update local Zustand state
+            releasePay(job.id, milestoneId);
+
+            // 5. Reload backend data so UI reflects the change
+            loadBackendJob();
+
+            // 6. Show success confirmation
+            setPaidSuccess({ milestoneId, amount, freelancerNewBalance });
+
+            // 7. Unlock download if this was the only milestone
+            const allDone = job.milestones.filter((m) => m.id !== milestoneId).every((m) => m.paidAt || m.status === 'APPROVED');
+            if (allDone) unlockDownload(job.id, ['final_deliverable.zip', 'source_code.zip', 'documentation.pdf']);
+
+        } catch (err) {
+            setReleaseError(err.message || 'Transfer failed. Check your wallet balance.');
+        } finally {
+            setReleasing(null);
         }
-        setReleasing(null);
     }
+    const pct = Math.round(((job.escrow?.released || 0) / (job.escrow?.total || 1)) * 100);
     return (<div style={{ padding: "1.5rem", maxWidth: 900, margin: "0 auto" }}>
-      <button onClick={() => navigate("/dashboard/employer/jobs")} style={{ display: "flex", alignItems: "center", gap: "0.4rem", background: "none", border: "none", color: "hsl(220 15% 55%)", cursor: "pointer", fontSize: "0.875rem", marginBottom: "1.25rem", padding: 0 }}>
+      <button onClick={() => navigate("/dashboard/employer/jobs")} style={{ display: "flex", alignItems: "center", gap: "0.4rem", background: "none", border: "none", color: "hsl(var(--text-2))", cursor: "pointer", fontSize: "0.875rem", marginBottom: "1.25rem", padding: 0 }}>
         <ArrowLeft size={16}/> Back to Jobs
       </button>
 
       {/* Header */}
       <div style={{ marginBottom: "1.75rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-          <h1 className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", letterSpacing: "-0.03em" }}>{job.title}</h1>
-          <span style={{ fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 6, background: "hsl(217 91% 55% / 0.12)", color: "hsl(217 91% 70%)", textTransform: "uppercase" }}>
+          <h1 className="font-heading" style={{ fontSize: "1.5rem", fontWeight: 800, color: "hsl(var(--text))", letterSpacing: "-0.03em" }}>{job.title}</h1>
+          <span style={{ fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 6, background: "hsl(var(--primary) / 0.1)", color: "hsl(var(--primary-dark))", textTransform: "uppercase" }}>
             {job.status.replace("_", " ")}
           </span>
         </div>
-        <p style={{ color: "hsl(220 15% 55%)", fontSize: "0.875rem" }}>
-          Contractor: <strong style={{ color: "white" }}>{job.freelancerName}</strong> · Budget: <strong style={{ color: "white" }}>{formatCurrency(job.budget)}</strong>
+        <p style={{ color: "hsl(var(--text-2))", fontSize: "0.875rem" }}>
+          Contractor: <strong style={{ color: "hsl(var(--text))" }}>{job.freelancerName}</strong> · Budget: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(job.budget)}</strong>
         </p>
       </div>
 
       {/* Escrow Status Bar */}
-      <div className="card" style={{ marginBottom: "1.5rem", background: job.escrow.status === "FUNDED" || job.escrow.status === "PARTIAL_RELEASE" ? "hsl(145 65% 42% / 0.05)" : "hsl(220 14% 9%)", border: `1px solid ${job.escrow.status === "FUNDED" || job.escrow.status === "PARTIAL_RELEASE" ? "hsl(145 65% 42% / 0.25)" : "hsl(220 20% 16%)"}` }}>
+      <div className="card" style={{ marginBottom: "1.5rem", background: job.escrow.status === "FUNDED" || job.escrow.status === "PARTIAL_RELEASE" ? "hsl(145 65% 42% / 0.05)" : "hsl(var(--surface-2))", border: `1px solid ${job.escrow.status === "FUNDED" || job.escrow.status === "PARTIAL_RELEASE" ? "hsl(145 65% 42% / 0.25)" : "hsl(var(--surface-4))"}` }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             <div style={{ width: 36, height: 36, borderRadius: 9, background: "hsl(145 65% 42% / 0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Lock size={18} color="hsl(145 65% 55%)"/>
             </div>
             <div>
-              <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "white" }}>Kora Escrow</div>
-              <div style={{ fontSize: "0.75rem", color: "hsl(145 65% 50%)" }}>
-                {job.escrow.koraTxId ? `TX: ${job.escrow.koraTxId}` : "Pending"}
+              <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "hsl(var(--text))" }}>ILP Escrow</div>
+              <div style={{ fontSize: "0.75rem", color: "hsl(var(--success))" }}>
+                {job.escrow.ilpTxId ? `TX: ${job.escrow.ilpTxId}` : "Pending"}
               </div>
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div className="font-heading" style={{ fontSize: "1.2rem", fontWeight: 800, color: "white" }}>{formatCurrency(job.escrow.funded)}</div>
-            <div style={{ fontSize: "0.72rem", color: "hsl(220 15% 50%)" }}>locked on Kora network</div>
+            <div className="font-heading" style={{ fontSize: "1.2rem", fontWeight: 800, color: "hsl(var(--text))" }}>{formatCurrency(job.escrow.funded)}</div>
+            <div style={{ fontSize: "0.72rem", color: "hsl(var(--text-2))" }}>locked on ILP network</div>
           </div>
         </div>
-        <div style={{ height: 8, background: "hsl(220 20% 16%)", borderRadius: 99, overflow: "hidden", marginBottom: "0.6rem" }}>
+        <div style={{ height: 8, background: "hsl(var(--surface-4))", borderRadius: 99, overflow: "hidden", marginBottom: "0.6rem" }}>
           <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, hsl(145 65% 42%), hsl(145 65% 55%))", borderRadius: 99, transition: "width 1s ease" }}/>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", color: "hsl(220 15% 50%)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", color: "hsl(var(--text-2))" }}>
           <span>{formatCurrency(job.escrow.released)} released → freelancer wallet</span>
           <span>{formatCurrency(job.escrow.total - job.escrow.released)} pending ({100 - pct}%)</span>
         </div>
       </div>
+
+      {/* Payment Success Banner */}
+      {paidSuccess && (
+        <div style={{ background: "hsl(145 65% 42% / 0.12)", border: "1px solid hsl(145 65% 42% / 0.4)", borderRadius: 12, padding: "1rem 1.25rem", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "1rem" }}>
+          <CheckCircle size={28} color="hsl(145 65% 55%)" style={{ flexShrink: 0 }}/>
+          <div>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: "hsl(var(--success))" }}>✅ Payment Released Successfully!</div>
+            <div style={{ fontSize: "0.85rem", color: "hsl(var(--text-2))", marginTop: "0.2rem" }}>
+              {formatCurrency(paidSuccess.amount)} sent to freelancer's wallet
+              {paidSuccess.freelancerNewBalance != null && <> · Freelancer new balance: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(paidSuccess.freelancerNewBalance)}</strong></>}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Download lock alert */}
       {!job.downloadUnlocked && job.status !== "COMPLETED" && (<div style={{ background: "hsl(38 92% 50% / 0.08)", border: "1px solid hsl(38 92% 50% / 0.25)", borderRadius: 10, padding: "0.875rem 1.125rem", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <Lock size={16} color="hsl(38 92% 60%)"/>
           <div>
             <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "hsl(38 92% 65%)" }}>Download Lock Active</div>
-            <div style={{ fontSize: "0.78rem", color: "hsl(220 15% 55%)" }}>Final deliverables are locked until all milestone payments are released. This protects the freelancer.</div>
+            <div style={{ fontSize: "0.78rem", color: "hsl(var(--text-2))" }}>Final deliverables are locked until all milestone payments are released. This protects the freelancer.</div>
           </div>
         </div>)}
 
@@ -123,7 +222,7 @@ export default function ContractPage() {
       {job.downloadUnlocked && (<div style={{ background: "hsl(145 65% 42% / 0.08)", border: "1px solid hsl(145 65% 42% / 0.3)", borderRadius: 10, padding: "0.875rem 1.125rem", marginBottom: "1.5rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
             <CheckCircle size={18} color="hsl(145 65% 55%)"/>
-            <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "hsl(145 65% 55%)" }}>🎉 Download Unlocked — All payments released!</div>
+            <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "hsl(var(--success))" }}>🎉 Download Unlocked — All payments released!</div>
           </div>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             {job.finalFiles?.map((file, idx) => (<button id={idx === 0 ? "download-deliverable-btn" : undefined} key={file} className="btn btn-outline btn-sm" style={{ fontSize: "0.78rem", gap: "0.35rem" }}>
@@ -134,7 +233,7 @@ export default function ContractPage() {
 
       {/* Milestones */}
       <div>
-        <h2 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "white", marginBottom: "1rem" }}>
+        <h2 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))", marginBottom: "1rem" }}>
           Milestones & Payment Release
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -144,74 +243,98 @@ export default function ContractPage() {
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", marginBottom: "0.75rem" }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "hsl(220 15% 45%)", textTransform: "uppercase", letterSpacing: "0.06em" }}>M{i + 1}</span>
+                      <span style={{ fontSize: "0.72rem", color: "hsl(var(--text-3))", textTransform: "uppercase", letterSpacing: "0.06em" }}>M{i + 1}</span>
                       <StatusBadge status={milestone.status}/>
                     </div>
-                    <h3 className="font-heading" style={{ fontSize: "1rem", fontWeight: 700, color: "white" }}>{milestone.title}</h3>
-                    <p style={{ fontSize: "0.8rem", color: "hsl(220 15% 60%)", marginTop: "0.25rem" }}>{milestone.description}</p>
+                    <h3 className="font-heading" style={{ fontSize: "1rem", fontWeight: 700, color: "hsl(var(--text))" }}>{milestone.title}</h3>
+                    <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))", marginTop: "0.25rem" }}>{milestone.description}</p>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div className="font-heading" style={{ fontSize: "1.15rem", fontWeight: 800, color: "white" }}>{formatCurrency(milestone.amount)}</div>
-                    {milestone.paidAt && <div style={{ fontSize: "0.7rem", color: "hsl(145 65% 50%)" }}>Paid ✓</div>}
+                    <div className="font-heading" style={{ fontSize: "1.15rem", fontWeight: 800, color: "hsl(var(--text))" }}>{formatCurrency(milestone.amount)}</div>
+                    {milestone.paidAt && <div style={{ fontSize: "0.7rem", color: "hsl(var(--success))" }}>Paid ✓</div>}
                   </div>
                 </div>
 
-                {/* Submission info */}
-                {(milestone.status === "UNDER_REVIEW" || milestone.status === "APPROVED" || milestone.status === "NEEDS_REVISION" || milestone.status === "ESCALATED") && milestone.verificationResult && (<div>
-                    {/* AI Verdict */}
-                    <div style={{
-                    background: milestone.verificationResult.verdict === "APPROVED" ? "hsl(145 65% 42% / 0.08)" : milestone.verificationResult.verdict === "NEEDS_REVISION" ? "hsl(0 84% 60% / 0.08)" : "hsl(38 92% 50% / 0.08)",
-                    border: `1px solid ${milestone.verificationResult.verdict === "APPROVED" ? "hsl(145 65% 42% / 0.25)" : milestone.verificationResult.verdict === "NEEDS_REVISION" ? "hsl(0 84% 60% / 0.25)" : "hsl(38 92% 50% / 0.25)"}`,
-                    borderRadius: 8, padding: "0.875rem", marginBottom: "0.75rem"
-                }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                          <Shield size={14} color={milestone.verificationResult.verdict === "APPROVED" ? "hsl(145 65% 55%)" : "hsl(0 84% 65%)"}/>
-                          <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "hsl(220 15% 75%)" }}>Gemini AI Verdict: <span style={{ color: milestone.verificationResult.verdict === "APPROVED" ? "hsl(145 65% 55%)" : "hsl(0 84% 65%)" }}>{milestone.verificationResult.verdict}</span></span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                          <span style={{ fontSize: "0.75rem", color: "hsl(220 15% 50%)" }}>Confidence: <strong style={{ color: "white" }}>{milestone.verificationResult.confidence}%</strong></span>
-                          <button onClick={() => setExpandedVerdict(expandedVerdict === milestone.id ? null : milestone.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "hsl(217 91% 60%)", fontSize: "0.75rem", display: "flex", alignItems: "center", gap: "0.2rem" }}>
-                            <Eye size={13}/> Details
-                          </button>
-                        </div>
-                      </div>
-                      <p style={{ fontSize: "0.8rem", color: "hsl(220 15% 65%)", lineHeight: 1.5 }}>{milestone.verificationResult.summary}</p>
-
-                      {expandedVerdict === milestone.id && (<div style={{ marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid hsl(220 20% 18%)" }}>
-                          <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "hsl(220 15% 50%)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Criteria Checklist</div>
-                          {milestone.verificationResult.checklist?.map((item, ci) => (<div key={ci} style={{ display: "flex", gap: "0.5rem", marginBottom: "0.4rem" }}>
-                              {item.passed ? <CheckCircle size={13} color="hsl(145 65% 55%)" style={{ flexShrink: 0, marginTop: 1 }}/> : <AlertTriangle size={13} color="hsl(0 84% 60%)" style={{ flexShrink: 0, marginTop: 1 }}/>}
-                              <div>
-                                <span style={{ fontSize: "0.78rem", color: item.passed ? "hsl(145 65% 55%)" : "hsl(0 84% 65%)", fontWeight: 600 }}>{item.criterion}: </span>
-                                <span style={{ fontSize: "0.78rem", color: "hsl(220 15% 55%)" }}>{item.note}</span>
-                              </div>
-                            </div>))}
-                          {milestone.verificationResult.suggestedRevisions && milestone.verificationResult.suggestedRevisions.length > 0 && (<div style={{ marginTop: "0.5rem" }}>
-                              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "hsl(0 84% 65%)", marginBottom: "0.3rem" }}>Suggested Revisions:</div>
-                              {milestone.verificationResult.suggestedRevisions.map((r, ri) => (<div key={ri} style={{ fontSize: "0.78rem", color: "hsl(220 15% 60%)", marginBottom: "0.2rem" }}>• {r}</div>))}
-                            </div>)}
-                        </div>)}
+                {/* AI Report — only shown when verificationResult is in memory */}
+                {milestone.verificationResult && (
+                  <div style={{ background: "hsl(38 92% 50% / 0.06)", border: "1px solid hsl(38 92% 50% / 0.2)", borderRadius: 8, padding: "0.875rem", marginBottom: "0.75rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                      <Shield size={14} color="hsl(145 65% 55%)"/>
+                      <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "hsl(var(--text-2))" }}>AI Review Report: <span style={{ color: "hsl(var(--success))" }}>Reviewed — Awaiting Your Approval</span></span>
+                      <button onClick={() => setExpandedVerdict(expandedVerdict === milestone.id ? null : milestone.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "hsl(217 91% 60%)", fontSize: "0.75rem", display: "flex", alignItems: "center", gap: "0.2rem", marginLeft: "auto" }}>
+                        <Eye size={13}/> {expandedVerdict === milestone.id ? "Hide" : "Details"}
+                      </button>
                     </div>
+                    <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))", lineHeight: 1.5 }}>{milestone.verificationResult.summary}</p>
+                    {expandedVerdict === milestone.id && (
+                      <div style={{ marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid hsl(var(--border))" }}>
+                        {milestone.verificationResult.checklist?.map((item, ci) => (
+                          <div key={ci} style={{ display: "flex", gap: "0.5rem", marginBottom: "0.4rem" }}>
+                            {item.passed ? <CheckCircle size={13} color="hsl(145 65% 55%)" style={{ flexShrink: 0, marginTop: 1 }}/> : <AlertTriangle size={13} color="hsl(0 84% 60%)" style={{ flexShrink: 0, marginTop: 1 }}/>}
+                            <span style={{ fontSize: "0.78rem", color: "hsl(var(--text-2))" }}><strong style={{ color: item.passed ? "hsl(145 65% 55%)" : "hsl(0 84% 65%)" }}>{item.criterion}:</strong> {item.note}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                    {/* Submitted files */}
-                    {milestone.submittedFiles && milestone.submittedFiles.length > 0 && (<div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
-                        {milestone.submittedFiles.map((f) => (<span key={f} style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.75rem", color: "hsl(217 91% 65%)", background: "hsl(217 91% 55% / 0.1)", border: "1px solid hsl(217 91% 55% / 0.2)", padding: "0.2rem 0.5rem", borderRadius: 4 }}>
-                            <FileText size={11}/> {f}
-                          </span>))}
-                      </div>)}
+                {/* Submitted files */}
+                {milestone.submittedFiles && milestone.submittedFiles.length > 0 && (
+                  <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
+                    {milestone.submittedFiles.map((f) => (
+                      <span key={f} style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.75rem", color: "hsl(var(--primary))", background: "hsl(var(--primary) / 0.1)", border: "1px solid hsl(var(--primary) / 0.3)", padding: "0.2rem 0.5rem", borderRadius: 4 }}>
+                        <FileText size={11}/> {f}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-                    {/* Actions */}
-                    {milestone.status === "APPROVED" && !milestone.paidAt && (<button id="approve-payout-btn" onClick={() => handleRelease(milestone.id, milestone.amount)} disabled={releasing === milestone.id} className="btn btn-primary btn-sm" style={{ fontWeight: 700, gap: "0.4rem" }}>
+                {/* ✅ APPROVE & RELEASE BUTTON — standalone, always visible when milestone is submitted */}
+                {(() => {
+                  const bm = backendMilestones.find(m => m.id === milestone.id);
+                  const bmStatus = (bm?.status || '').toLowerCase();
+                  const localStatus = (milestone.status || '').toLowerCase();
+                  const isSubmitted = ['submitted', 'under_review', 'approved'].includes(bmStatus) || ['under_review', 'approved'].includes(localStatus);
+                  const alreadyPaid = milestone.paidAt || bmStatus === 'paid';
+                  if (!isSubmitted || alreadyPaid) return null;
+                  return (
+                    <div style={{ marginTop: "0.5rem", paddingTop: "0.75rem", borderTop: "1px solid hsl(var(--border))" }}>
+                      <div style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))", marginBottom: "0.6rem" }}>
+                        Freelancer has submitted this milestone. Review and release payment.
+                      </div>
+                      <button
+                        id="approve-payout-btn"
+                        onClick={() => handleRelease(milestone.id, milestone.amount)}
+                        disabled={releasing === milestone.id}
+                        className="btn btn-primary"
+                        style={{ fontWeight: 700, gap: "0.5rem", fontSize: "0.95rem", padding: "0.65rem 1.5rem" }}
+                      >
                         {releasing === milestone.id
-                        ? <><Loader2 size={14} style={{ animation: "spin 1s linear infinite" }}/> Sending via Kora...</>
-                        : <><Zap size={14}/> Release {formatCurrency(milestone.amount)} to Freelancer</>}
-                      </button>)}
-                  </div>)}
+                          ? <><Loader2 size={15} style={{ animation: "spin 1s linear infinite" }}/> Sending to freelancer wallet...</>
+                          : <><CheckCircle size={15}/> Approve &amp; Release {formatCurrency(milestone.amount)} to Freelancer</>}
+                      </button>
+                      {releaseError && releasing === null && (
+                        <div style={{ marginTop: "0.5rem", fontSize: "0.78rem", color: "hsl(0 84% 65%)", background: "hsl(0 84% 60% / 0.08)", border: "1px solid hsl(0 84% 60% / 0.2)", borderRadius: 6, padding: "0.5rem 0.75rem" }}>⚠ {releaseError}</div>
+                      )}
+                    </div>
+                  );
+                })()}
 
-                {milestone.status === "IN_PROGRESS" && (<div style={{ fontSize: "0.8rem", color: "hsl(217 91% 60%)", display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.25rem" }}>
-                    <Play size={12} fill="currentColor"/> Awaiting freelancer submission
-                  </div>)}
+                {/* Paid confirmation */}
+                {milestone.paidAt && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem", fontSize: "0.82rem", color: "hsl(var(--success))" }}>
+                    <CheckCircle size={14}/> Payment released · {formatCurrency(milestone.amount)} sent to freelancer
+                  </div>
+                )}
+
+                {/* Awaiting submission */}
+                {(milestone.status === "IN_PROGRESS" || milestone.status === "LOCKED") && !milestone.paidAt && (
+                  <div style={{ fontSize: "0.8rem", color: "hsl(217 91% 60%)", display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.25rem" }}>
+                    <Play size={12} fill="currentColor"/> {milestone.status === "LOCKED" ? "Locked — previous milestone must be completed first" : "Awaiting freelancer submission"}
+                  </div>
+                )}
+
               </div>
             </div>))}
         </div>
@@ -223,66 +346,66 @@ export default function ContractPage() {
         {/* Left Side: Escrow Funding Action */}
         <div className="card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
-            <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "white", marginBottom: "0.5rem" }}>Escrow Funding</h3>
-            <p style={{ color: "hsl(220 15% 55%)", fontSize: "0.82rem", lineHeight: 1.5, marginBottom: "1rem" }}>
-              Pre-authorize and lock project budget into Kora (Kora Protocol) escrow contract. The contractor will see the funds are secured before starting work.
+            <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))", marginBottom: "0.5rem" }}>Escrow Funding</h3>
+            <p style={{ color: "hsl(var(--text-2))", fontSize: "0.82rem", lineHeight: 1.5, marginBottom: "1rem" }}>
+              Pre-authorize and lock project budget into ILP (Interledger Protocol) escrow contract. The contractor will see the funds are secured before starting work.
             </p>
-            {job.escrow.status === "PENDING" && (
-              <div style={{ marginBottom: "1.25rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "hsl(220 15% 65%)", display: "block", marginBottom: "0.4rem", fontWeight: 600 }}>Payment Currency (DCC)</label>
-                <select 
-                  className="input" 
-                  value={paymentCurrency} 
-                  onChange={(e) => setPaymentCurrency(e.target.value)}
-                  style={{ width: "100%", padding: "0.5rem", background: "hsl(220 20% 12%)", color: "white", border: "1px solid hsl(220 20% 18%)", borderRadius: 6, fontSize: "0.85rem" }}
-                >
-                  <option value="NGN">NGN (Local Settlement)</option>
-                  <option value="USD">USD (Dynamic Currency Conversion)</option>
-                  <option value="EUR">EUR (Dynamic Currency Conversion)</option>
-                  <option value="GBP">GBP (Dynamic Currency Conversion)</option>
-                </select>
-                <p style={{ fontSize: "0.72rem", color: "hsl(217 91% 60%)", marginTop: "0.5rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
-                  <Zap size={12} />
-                  Freelancer will receive NGN via local settlement.
-                </p>
-              </div>
-            )}
           </div>
           {job.escrow.status === "PENDING" ? (
-            <button 
-              id="lock-escrow-btn" 
-              onClick={async () => {
-                setIsFunding(true);
-                await fundEscrow(job.id, job.employerId, job.freelancerId, job.escrow.total, paymentCurrency, 'NGN');
-                setIsFunding(false);
-              }} 
-              disabled={isFunding}
-              className="btn btn-primary" 
-              style={{ width: "100%", gap: "0.5rem" }}
-            >
-              {isFunding ? <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }}/> Redirecting to Kora...</> : <><Lock size={16}/> Fund & Lock Escrow</>}
-            </button>
+            <div>
+              <button 
+                id="lock-escrow-btn" 
+                onClick={async () => {
+                  try {
+                    const token = localStorage.getItem('afrizend_token');
+                    const res = await fetch(`${API_URL}/escrow/fund`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                      body: JSON.stringify({ job_id: job.id })
+                    });
+                    
+                    if (!res.ok) {
+                      const data = await res.json();
+                      throw new Error(data.error || "Failed to fund escrow");
+                    }
+                    
+                    // Success! Update local store
+                    fundEscrow(job.id);
+                    
+                    // Refresh wallet balance
+                    useAuthStore.getState().fetchMe();
+                    
+                  } catch (err) {
+                    alert(err.message);
+                  }
+                }} 
+                className="btn btn-primary" 
+                style={{ width: "100%", gap: "0.5rem" }}
+              >
+                <Lock size={16}/> Fund & Lock Escrow
+              </button>
+            </div>
           ) : (
             <div style={{ background: "hsl(145 65% 42% / 0.08)", border: "1px solid hsl(145 65% 42% / 0.2)", borderRadius: 8, padding: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <CheckCircle size={16} color="hsl(145 65% 55%)"/>
-              <span style={{ fontSize: "0.85rem", color: "hsl(145 65% 55%)", fontWeight: 600 }}>Escrow Funded on Kora ✓</span>
+              <span style={{ fontSize: "0.85rem", color: "hsl(var(--success))", fontWeight: 600 }}>Escrow Funded on ILP ✓</span>
             </div>
           )}
         </div>
 
         {/* Right Side: Chat & Collaboration */}
         <div className="card" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "white" }}>Encrypted Collaboration</h3>
+          <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))" }}>Encrypted Collaboration</h3>
           
           {/* Chat Messages list */}
-          <div style={{ flex: 1, minHeight: 120, background: "hsl(220 20% 6%)", border: "1px solid hsl(220 20% 12%)", borderRadius: 8, padding: "0.75rem", overflowY: "auto", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <div style={{ fontSize: "0.72rem", color: "hsl(220 15% 40%)", textAlign: "center", marginBottom: 4 }}>End-to-End Encrypted Tunnel</div>
+          <div style={{ flex: 1, minHeight: 120, background: "hsl(var(--surface-3))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "0.75rem", overflowY: "auto", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            <div style={{ fontSize: "0.72rem", color: "hsl(var(--text-3))", textAlign: "center", marginBottom: 4 }}>End-to-End Encrypted Tunnel</div>
             
             {chatMessages.map((msg, index) => (
               <div key={index} style={{ alignSelf: msg.sender === "You" ? "flex-end" : "flex-start", maxWidth: "80%" }}>
                 <div style={{ 
-                  background: msg.sender === "You" ? "hsl(217 91% 55%)" : "hsl(220 20% 12%)", 
-                  color: "white", 
+                  background: msg.sender === "You" ? "hsl(217 91% 55%)" : "hsl(var(--surface-3))", 
+                  color: "hsl(var(--text))", 
                   padding: "0.4rem 0.75rem", 
                   borderRadius: msg.sender === "You" ? "12px 12px 0 12px" : "12px 12px 12px 0", 
                   fontSize: "0.8rem", 
@@ -290,7 +413,7 @@ export default function ContractPage() {
                 }}>
                   {msg.text}
                 </div>
-                <div style={{ fontSize: "0.65rem", color: "hsl(220 15% 45%)", textAlign: msg.sender === "You" ? "right" : "left", marginTop: 2 }}>{msg.sender}</div>
+                <div style={{ fontSize: "0.65rem", color: "hsl(var(--text-3))", textAlign: msg.sender === "You" ? "right" : "left", marginTop: 2 }}>{msg.sender}</div>
               </div>
             ))}
           </div>

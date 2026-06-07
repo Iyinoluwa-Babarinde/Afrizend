@@ -1,20 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+
 :root {
-  --primary: 260 85% 60%;
-  --primary-dark: 260 85% 45%;
-  --primary-light: 260 85% 72%;
-  --surface: 0 0% 4%;
-  --surface-2: 220 14% 8%;
-  --surface-3: 220 16% 12%;
-  --surface-4: 220 18% 16%;
-  --border: 220 20% 16%;
-  --border-light: 220 22% 22%;
-  --text: 0 0% 98%;
-  --text-2: 220 15% 65%;
-  --text-3: 220 12% 45%;
-  --accent: 195 100% 60%;
+  --primary: 153 72% 29%;
+  --primary-dark: 153 76% 22%;
+  --primary-light: 153 60% 45%;
+  --surface: 0 0% 100%;
+  --surface-2: 210 40% 98%;
+  --surface-3: 0 0% 100%;
+  --surface-4: 214 32% 96%;
+  --border: 214 32% 91%;
+  --border-light: 214 32% 85%;
+  --text: 222 47% 11%;
+  --text-2: 215 25% 40%;
+  --text-3: 215 16% 50%;
+  --accent: 153 72% 35%;
   --success: 145 65% 42%;
   --warning: 38 92% 50%;
   --error: 0 84% 60%;
@@ -28,14 +29,14 @@
   --radius-xl: 1.5rem;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
-  --shadow: 0 4px 16px rgba(0,0,0,0.5);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
-  --shadow-blue: 0 4px 24px hsl(217 91% 55% / 0.25);
-  --shadow-blue-lg: 0 8px 40px hsl(217 91% 55% / 0.35);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+  --shadow-blue: 0 4px 24px hsl(153 72% 29% / 0.15);
+  --shadow-blue-lg: 0 8px 40px hsl(153 72% 29% / 0.25);
 
-  --glow-blue: 0 0 20px hsl(217 91% 55% / 0.4);
-  --glow-cyan: 0 0 20px hsl(200 100% 60% / 0.3);
+  --glow-blue: 0 0 20px hsl(153 72% 29% / 0.2);
+  --glow-cyan: 0 0 20px hsl(153 72% 35% / 0.15);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -79,13 +80,14 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glass morphism */
 .glass {
-  background: hsl(var(--surface-2) / 0.7);
+  background: hsl(var(--surface) / 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-sm);
 }
 .glass-strong {
-  background: hsl(var(--surface-3) / 0.85);
+  background: hsl(var(--surface-2) / 0.9);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border: 1px solid hsl(var(--border-light));
@@ -347,8 +349,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Hero bg */
 .hero-bg {
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, hsl(var(--primary) / 0.18), transparent),
-    radial-gradient(ellipse 40% 40% at 80% 80%, hsl(var(--accent) / 0.08), transparent),
+    radial-gradient(ellipse 80% 50% at 50% -10%, hsl(var(--primary) / 0.08), transparent),
+    radial-gradient(ellipse 40% 40% at 80% 80%, hsl(var(--accent) / 0.05), transparent),
     hsl(var(--surface));
 }
 

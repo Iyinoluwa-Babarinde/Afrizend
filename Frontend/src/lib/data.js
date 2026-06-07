@@ -20,7 +20,6 @@ export const DEMO_JOBS = [
         downloadUnlocked: false,
     }
 ];
-
 export const DEMO_TRANSACTIONS = [
     {
         id: "tx_1",
@@ -28,10 +27,10 @@ export const DEMO_TRANSACTIONS = [
         type: "DEPOSIT",
         amount: 1500,
         status: "COMPLETED",
-        description: "Kora Virtual Account Inbound Deposit",
-        from: "External Bank (USD)",
-        to: "Kora Virtual Wallet",
-        txHash: "kora_txn_12389ab",
+        description: "Wallet Deposit",
+        from: "External Bank",
+        to: "Wallet",
+        txHash: "0x123...abc",
     },
     {
         id: "tx_2",
@@ -39,13 +38,12 @@ export const DEMO_TRANSACTIONS = [
         type: "PAYMENT",
         amount: -500,
         status: "COMPLETED",
-        description: "Milestone 1 Payment Escrow Lock",
-        from: "Kora Virtual Wallet",
-        to: "Kora Escrow Contract",
-        txHash: "kora_escrow_4567def",
+        description: "Milestone 1 Payment for job_1",
+        from: "Wallet",
+        to: "Escrow",
+        txHash: "0x456...def",
     }
 ];
-
 export const EARNINGS_DATA = [
     { month: "Jan", earnings: 4000 },
     { month: "Feb", earnings: 3000 },
@@ -55,7 +53,6 @@ export const EARNINGS_DATA = [
     { month: "Jun", earnings: 2390 },
     { month: "Jul", earnings: 3490 },
 ];
-
 export const DEMO_SESSIONS = [
     {
         id: "session_1",
@@ -79,19 +76,103 @@ export const DEMO_SESSIONS = [
     }
 ];
 
+// Expanded demo freelancer pool — 6 diverse profiles shown alongside real registered users
 export const DEMO_CONSULTANTS = [
     {
-        id: "user_freelancer_1",
+        id: "demo_f_1",
         name: "Sam Developer",
         title: "Senior Full Stack Engineer",
         hourlyRate: 80,
+        hourly_rate: 80,
         ratePerMinute: 1.33,
-        skills: ["React", "Node.js", "TypeScript"],
+        skills: ["React", "Node.js", "TypeScript", "PostgreSQL"],
         rating: 4.9,
         trustScore: 99,
+        trust_score: 99,
         reviews: 120,
         avatar: "https://i.pravatar.cc/150?u=sam",
-    }
+        bio: "10+ years building scalable web applications for startups and Fortune 500 companies.",
+        isDemo: true,
+    },
+    {
+        id: "demo_f_2",
+        name: "Aisha Kofi",
+        title: "UI/UX Designer & Framer Expert",
+        hourlyRate: 65,
+        hourly_rate: 65,
+        ratePerMinute: 1.08,
+        skills: ["Figma", "Framer", "CSS", "React", "Design Systems"],
+        rating: 4.8,
+        trustScore: 96,
+        trust_score: 96,
+        reviews: 87,
+        avatar: "https://i.pravatar.cc/150?u=aisha",
+        bio: "Award-winning designer creating pixel-perfect interfaces for web3 and fintech brands.",
+        isDemo: true,
+    },
+    {
+        id: "demo_f_3",
+        name: "Carlos Mendez",
+        title: "Blockchain & Smart Contract Developer",
+        hourlyRate: 120,
+        hourly_rate: 120,
+        ratePerMinute: 2.0,
+        skills: ["Solidity", "Ethereum", "Rust", "Web3.js", "Hardhat"],
+        rating: 4.9,
+        trustScore: 98,
+        trust_score: 98,
+        reviews: 64,
+        avatar: "https://i.pravatar.cc/150?u=carlos",
+        bio: "Audited 40+ DeFi protocols. Specializes in EVM-compatible smart contracts and tokenomics.",
+        isDemo: true,
+    },
+    {
+        id: "demo_f_4",
+        name: "Priya Nair",
+        title: "AI/ML Engineer",
+        hourlyRate: 110,
+        hourly_rate: 110,
+        ratePerMinute: 1.83,
+        skills: ["Python", "TensorFlow", "PyTorch", "LLMs", "Data Science"],
+        rating: 4.7,
+        trustScore: 94,
+        trust_score: 94,
+        reviews: 43,
+        avatar: "https://i.pravatar.cc/150?u=priya",
+        bio: "Ex-Google ML researcher. Builds production-grade AI pipelines and fine-tunes LLMs.",
+        isDemo: true,
+    },
+    {
+        id: "demo_f_5",
+        name: "Luca Bianchi",
+        title: "Mobile App Developer (iOS & Android)",
+        hourlyRate: 90,
+        hourly_rate: 90,
+        ratePerMinute: 1.5,
+        skills: ["Swift", "Kotlin", "React Native", "Flutter", "Firebase"],
+        rating: 4.8,
+        trustScore: 97,
+        trust_score: 97,
+        reviews: 102,
+        avatar: "https://i.pravatar.cc/150?u=luca",
+        bio: "500k+ downloads across published apps. Shipped 20+ native apps for global clients.",
+        isDemo: true,
+    },
+    {
+        id: "demo_f_6",
+        name: "Yuki Tanaka",
+        title: "DevOps & Cloud Infrastructure",
+        hourlyRate: 95,
+        hourly_rate: 95,
+        ratePerMinute: 1.58,
+        skills: ["AWS", "Docker", "Kubernetes", "Terraform", "CI/CD", "Go"],
+        rating: 4.9,
+        trustScore: 95,
+        trust_score: 95,
+        reviews: 78,
+        avatar: "https://i.pravatar.cc/150?u=yuki",
+        bio: "Scaled infra to 50M+ users. AWS Certified Solutions Architect with zero-downtime deployments.",
+        isDemo: true,
+    },
 ];
-
 export const DEMO_FREELANCERS = DEMO_CONSULTANTS;
