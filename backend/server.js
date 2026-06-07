@@ -9,51 +9,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Prisma Configuration
-const { Pool } = require('pg');
-const { PrismaPg } = require('@prisma/adapter-pg');
 const { PrismaClient } = require('@prisma/client');
 
-let connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/afrizend";
-
-if (connectionString.startsWith('prisma+postgres://')) {
-    try {
-        const url = new URL(connectionString);
-        const apiKey = url.searchParams.get('api_key');
-        if (apiKey) {
-            const decoded = Buffer.from(apiKey, 'base64').toString('utf-8');
-            const payload = JSON.parse(decoded);
-            if (payload.databaseUrl) {
-                connectionString = payload.databaseUrl;
-                console.log("Extracted direct TCP Postgres URL from Prisma dev.");
-            }
-        }
-    } catch (e) {
-        console.warn("Failed to parse local Prisma dev URL.", e);
-    }
-}
-
-const isRenderExternal = connectionString && connectionString.includes('.render.com');
-const pool = new Pool({ 
-    connectionString,
-    ...(isRenderExternal && { ssl: { rejectUnauthorized: false } })
-});
-
-try {
-    const parsedUrl = new URL(connectionString);
-    const schema = parsedUrl.searchParams.get('schema');
-    if (schema) {
-        pool.on('connect', (client) => {
-            client.query(`SET search_path TO "${schema}"`).catch(err => {
-                console.error("Failed to set search_path:", err);
-            });
-        });
-    }
-} catch (e) {
-    console.warn("Could not parse schema from connection string.");
-}
-
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'afrizend-super-secret-key-2025';
 
