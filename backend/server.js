@@ -598,6 +598,32 @@ app.get('/api/jobs/:id/my-application', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/api/freelancers', async (req, res) => {
+  try {
+    const freelancers = await prisma.user.findMany({
+      where: { role: 'freelancer' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        skills: true,
+        hourly_rate: true,
+        trust_score: true
+      }
+    });
+    // Parse skills if it's a string, just like we do in /api/auth/me
+    const formatted = freelancers.map(f => ({
+      ...f,
+      skills: f.skills ? JSON.parse(f.skills) : []
+    }));
+    res.json(formatted);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 app.post('/api/jobs/:id/accept-applicant', authenticateToken, async (req, res) => {
   const { freelancer_id } = req.body;
   const jobId = req.params.id;
