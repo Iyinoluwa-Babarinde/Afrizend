@@ -32,7 +32,24 @@ if (connectionString.startsWith('prisma+postgres://')) {
     }
 }
 
-const pool = new Pool({ connectionString });
+const isRenderExternal = connectionString && connectionString.includes('.render.com');
+const pool = new Pool({ 
+    connectionString,
+    ...(isRenderExternal && { ssl: { rejectUnauthorized: false } })
+});
+
+try {
+    const parsedUrl = new URL(connectionString);
+    const schema = parsedUrl.searchParams.get('schema');
+    if (schema) {
+        pool.on('connect', (client) => {
+            client.query(`SET search_path TO "${schema}"`);
+        });
+    }
+} catch (e) {
+    console.warn("Could not parse schema from connection string.");
+}
+
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
