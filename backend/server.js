@@ -777,12 +777,23 @@ app.post('/api/escrow/transfer', authenticateToken, async (req, res) => {
   try {
     const employer = await prisma.user.findUnique({ where: { id: req.user.id } });
     const freelancerToPay = await prisma.user.findUnique({ where: { id: freelancer_id } });
+    
+    const milestone = await prisma.milestone.findUnique({ where: { id: milestone_id } });
+    if (milestone.status === 'paid') {
+      return res.status(400).json({ error: 'Milestone is already paid' });
+    }
+    if (milestone.status === 'approved') {
+      // Fix for the previous bug where it was set to 'approved' instead of 'paid' after transfer
+      await prisma.milestone.update({ where: { id: milestone_id }, data: { status: 'paid' } });
+      const updatedEmployer = await prisma.user.findUnique({ where: { id: req.user.id } });
+      return res.json({ success: true, message: 'Status corrected to paid', employerNewBalance: updatedEmployer.balance });
+    }
 
     const convertedAmount = convertCurrency(amount, employer.currency, freelancerToPay.currency);
 
     await prisma.milestone.update({
       where: { id: milestone_id },
-      data: { status: 'approved' }
+      data: { status: 'paid' }
     });
 
     const freelancer = await prisma.user.update({
