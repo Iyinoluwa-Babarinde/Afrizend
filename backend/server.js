@@ -794,7 +794,7 @@ app.post('/api/escrow/transfer', authenticateToken, async (req, res) => {
     await prisma.walletTransaction.create({
       data: {
         id: txId,
-        from_user_id: 'AFRIZEND_PLATFORM',
+        from_user_id: req.user.id,
         to_user_id: freelancer_id,
         amount: convertedAmount,
         type: 'ESCROW_PAYOUT',
