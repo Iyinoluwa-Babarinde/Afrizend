@@ -75,7 +75,7 @@ export default function EmployerDashboard() {
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))" }}>{formatCurrency(job.budget, user?.currency || "USD")}</div>
+                    <div className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))" }}>{formatCurrency(job.budget, job.currency || user?.currency || "USD")}</div>
                     <span className={`badge ${job.status === "OPEN" ? "badge-cyan" : "badge-blue"}`} style={{ marginTop: 4 }}>{job.status.replace("_", " ")}</span>
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export default function EmployerDashboard() {
                     <div style={{ marginBottom: "0.75rem" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
                         <span style={{ fontSize: "0.72rem", color: "hsl(var(--text-2))" }}>Escrow Funded</span>
-                        <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "hsl(var(--success))" }}>{formatCurrency(job.escrow.funded, user?.currency || "USD")} / {formatCurrency(job.escrow.total, user?.currency || "USD")}</span>
+                        <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "hsl(var(--success))" }}>{formatCurrency(job.escrow.funded, job.currency || user?.currency || "USD")} / {formatCurrency(job.escrow.total, job.currency || user?.currency || "USD")}</span>
                       </div>
                       <div className="meter-bar">
                         <div className="meter-fill" style={{ width: `${(job.escrow.funded / job.escrow.total) * 100}%` }}/>

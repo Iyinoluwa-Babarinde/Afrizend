@@ -181,7 +181,7 @@ export default function EmployerJobsPage() {
                   <div style={{ display: "flex", gap: "1rem", fontSize: "0.8rem", color: "hsl(var(--text-2))", marginBottom: "0.75rem", flexWrap: "wrap" }}>
                     {job.createdAt && <span>Posted: {formatDate(job.createdAt)}</span>}
                     {job.deadline && <span>Deadline: {formatDate(job.deadline)}</span>}
-                    <span>Budget: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(job.budget, job.currency)}</strong></span>
+                    <span>Budget: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(job.budget, job.currency || user?.currency || 'USD')}</strong></span>
                     {(job.freelancerName || job.freelancer_name) && <span>Freelancer: <strong style={{ color: "hsl(var(--text))" }}>{job.freelancerName || job.freelancer_name}</strong></span>}
                   </div>
                   <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>

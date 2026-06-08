@@ -135,7 +135,7 @@ export default function EmployerContractsPage() {
                                     <div>
                                         <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))", marginBottom: "0.25rem" }}>{job.title}</h3>
                                         <div style={{ fontSize: "0.82rem", color: "hsl(var(--text-2))" }}>
-                                            Freelancer: <strong style={{ color: "hsl(var(--text))" }}>{job.freelancerName}</strong> · Budget: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(job.budget, job.currency)}</strong>
+                                            Freelancer: <strong style={{ color: "hsl(var(--text))" }}>{job.freelancerName}</strong> · Budget: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(job.budget, job.currency || user?.currency || 'USD')}</strong>
                                         </div>
                                     </div>
                                     <Link to={`/dashboard/employer/jobs/${job.id}/contract`} className="btn btn-outline btn-sm review-submission-btn" style={{ gap: "0.4rem" }}>
