@@ -121,22 +121,28 @@ io.on('connection', (socket) => {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock_api_key');
 
 // ==========================================
-// CURRENCY CONVERSION (MOCK)
+// CURRENCY CONVERSION (HARDCODED RATES TO NGN)
 // ==========================================
-const EXCHANGE_RATES_TO_USD = {
-  USD: 1,
-  GBP: 0.78,
-  NGN: 1500,
-  KES: 130,
-  GHS: 14
+const EXCHANGE_RATES_TO_NGN = {
+  NGN: 1,
+  USD: 1360.54,
+  GBP: 1818.18,
+  KES: 10.53,
+  GHS: 115.12,
+  EUR: 1569.47
 };
 
 function convertCurrency(amount, fromCurrency, toCurrency) {
   if (fromCurrency === toCurrency) return amount;
-  const fromRate = EXCHANGE_RATES_TO_USD[fromCurrency || "USD"] || 1;
-  const toRate = EXCHANGE_RATES_TO_USD[toCurrency || "USD"] || 1;
-  const amountInUSD = amount / fromRate;
-  return Number((amountInUSD * toRate).toFixed(2));
+  
+  // Convert from origin currency to NGN
+  const fromRateToNGN = EXCHANGE_RATES_TO_NGN[fromCurrency || "NGN"] || 1;
+  const amountInNGN = amount * fromRateToNGN;
+  
+  // Convert from NGN to target currency
+  const toRateToNGN = EXCHANGE_RATES_TO_NGN[toCurrency || "NGN"] || 1;
+  
+  return Number((amountInNGN / toRateToNGN).toFixed(2));
 }
 
 // ==========================================
