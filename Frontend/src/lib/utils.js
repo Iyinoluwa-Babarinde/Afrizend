@@ -3,6 +3,23 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs) {
     return twMerge(clsx(inputs));
 }
+const EXCHANGE_RATES_TO_NGN = {
+    NGN: 1,
+    USD: 1360.54,
+    GBP: 1818.18,
+    KES: 10.53,
+    GHS: 115.12,
+    EUR: 1569.47
+};
+
+export function convertCurrency(amount, fromCurrency, toCurrency) {
+    if (fromCurrency === toCurrency) return amount;
+    const fromRateToNGN = EXCHANGE_RATES_TO_NGN[fromCurrency || "NGN"] || 1;
+    const toRateToNGN = EXCHANGE_RATES_TO_NGN[toCurrency || "NGN"] || 1;
+    const amountInNGN = amount * fromRateToNGN;
+    return Number((amountInNGN / toRateToNGN).toFixed(2));
+}
+
 export function formatCurrency(amount, currency = "NGN") {
     const localeMap = {
         "USD": "en-US",

@@ -5,9 +5,7 @@ import { useJobsStore } from "@/lib/jobs-store";
 import { verifyDeliverable } from "@/lib/gemini";
 import { Upload, FileText, ArrowLeft, Shield, Cpu, CheckCircle, AlertTriangle, RotateCcw, X, Zap, Lock } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
-function formatCurrency(n) {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
-}
+import { formatCurrency, convertCurrency } from "@/lib/utils";
 export default function SubmitMilestonePage() {
     const params = useParams();
     const navigate = useNavigate();
@@ -155,7 +153,7 @@ export default function SubmitMilestonePage() {
           {milestone.title}
         </h1>
         <p style={{ color: "hsl(var(--text-2))", fontSize: "0.875rem", marginTop: "0.25rem" }}>
-          {job.title} · {formatCurrency(milestone.amount)} on approval
+          {job.title} · {formatCurrency(convertCurrency(milestone.amount, job.currency, user?.currency), user?.currency || 'NGN')} on approval
         </p>
       </div>
 
@@ -233,7 +231,7 @@ export default function SubmitMilestonePage() {
           <div style={{ background: "hsl(var(--primary) / 0.1)", border: "1px solid hsl(var(--primary) / 0.3)", borderRadius: 8, padding: "0.75rem 0.875rem", display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
             <Cpu size={16} color="hsl(217 91% 65%)" style={{ flexShrink: 0, marginTop: 1 }}/>
             <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))", lineHeight: 1.5 }}>
-              Gemini AI will review your submission against the acceptance criteria. Approved submissions release <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(milestone.amount)}</strong> instantly to your ILP wallet. Average review time: under 30 seconds.
+              Gemini AI will review your submission against the acceptance criteria. Approved submissions release <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(convertCurrency(milestone.amount, job.currency, user?.currency), user?.currency || 'NGN')}</strong> instantly to your ILP wallet. Average review time: under 30 seconds.
             </p>
           </div>
 
@@ -288,7 +286,7 @@ export default function SubmitMilestonePage() {
               <Zap size={20} color="hsl(145 65% 55%)" style={{ flexShrink: 0 }}/>
               <div>
                 <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "hsl(var(--text))", marginBottom: "0.2rem" }}>
-                  {formatCurrency(milestone.amount)} queued for release
+                  {formatCurrency(convertCurrency(milestone.amount, job.currency, user?.currency), user?.currency || 'NGN')} queued for release
                 </div>
                 <div style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))" }}>
                   The employer will release payment from escrow. You'll receive it instantly to your ILP wallet.

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/lib/store";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, convertCurrency } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { Search, Upload, CheckCircle, FileText, Lock, Play, Clock, AlertTriangle, Zap, RotateCcw, Shield, RefreshCw } from "lucide-react";
 
@@ -154,7 +154,7 @@ export default function FreelancerContractsPage() {
                                         {(job.status || '').replace(/_/g, " ")}
                                     </span>
                                     <div className="font-heading" style={{ fontSize: "1.25rem", fontWeight: 800, color: "hsl(var(--text))" }}>
-                                        {formatCurrency(total)}
+                                        {formatCurrency(convertCurrency(total, job.currency, user?.currency), user?.currency || 'NGN')}
                                     </div>
                                 </div>
                             </div>
@@ -167,15 +167,15 @@ export default function FreelancerContractsPage() {
                                         <span style={{ fontSize: "0.8rem", color: "hsl(var(--text))", fontWeight: 600 }}>ILP Escrow</span>
                                     </div>
                                     <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--success))" }}>
-                                        {formatCurrency(total)} Secured
+                                        {formatCurrency(convertCurrency(total, job.currency, user?.currency), user?.currency || 'NGN')} Secured
                                     </span>
                                 </div>
                                 <div style={{ height: 6, background: "hsl(var(--surface-4))", borderRadius: 99, overflow: "hidden" }}>
                                     <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, hsl(145 65% 42%), hsl(145 65% 55%))", borderRadius: 99, transition: "width 0.8s ease" }}/>
                                 </div>
                                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem", fontSize: "0.75rem", color: "hsl(var(--text-2))" }}>
-                                    <span>{formatCurrency(released)} Paid to you</span>
-                                    <span>{formatCurrency(total - released)} Pending</span>
+                                    <span>{formatCurrency(convertCurrency(released, job.currency, user?.currency), user?.currency || 'NGN')} Paid to you</span>
+                                    <span>{formatCurrency(convertCurrency(total - released, job.currency, user?.currency), user?.currency || 'NGN')} Pending</span>
                                 </div>
                             </div>
 
@@ -213,7 +213,7 @@ export default function FreelancerContractsPage() {
 
                                                 <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                                     <div style={{ textAlign: "right" }}>
-                                                        <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "hsl(var(--text))" }}>{formatCurrency(m.amount)}</div>
+                                                        <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "hsl(var(--text))" }}>{formatCurrency(convertCurrency(m.amount, job.currency, user?.currency), user?.currency || 'NGN')}</div>
                                                         {isPaid && <div style={{ fontSize: "0.7rem", color: "hsl(var(--success))" }}>Paid ✓</div>}
                                                         {isApproved && <div style={{ fontSize: "0.7rem", color: "hsl(38 92% 60%)" }}>Pending Release</div>}
                                                     </div>

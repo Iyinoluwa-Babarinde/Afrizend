@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/lib/store";
 import { useJobsStore } from "@/lib/jobs-store";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, convertCurrency } from "@/lib/utils";
 import { Briefcase, Search, Cpu, Shield, X, Send, CheckCircle, Loader2 } from "lucide-react";
 
 const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api");
@@ -174,7 +174,7 @@ export default function FreelancerOpportunitiesPage() {
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem", flexShrink: 0, minWidth: 130 }}>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: "0.72rem", color: "hsl(var(--text-2))", marginBottom: 2 }}>Fixed Budget</div>
-                    <div className="font-heading" style={{ fontSize: "1.25rem", fontWeight: 800, color: "hsl(var(--text))" }}>{formatCurrency(job.budget)}</div>
+                    <div className="font-heading" style={{ fontSize: "1.25rem", fontWeight: 800, color: "hsl(var(--text))" }}>{formatCurrency(convertCurrency(job.budget, job.currency, user?.currency), user?.currency || 'NGN')}</div>
                   </div>
                   <button
                     className={`btn ${hasApplied ? 'btn-ghost' : 'btn-primary'}`}
@@ -226,7 +226,7 @@ export default function FreelancerOpportunitiesPage() {
               </div>) : (<>
                 <h3 className="font-heading" style={{ fontSize: "1.2rem", color: "hsl(var(--text))", marginBottom: "0.25rem" }}>Apply for Position</h3>
                 <p style={{ color: "hsl(var(--text-2))", fontSize: "0.82rem", marginBottom: "1.5rem" }}>
-                  <strong style={{ color: "hsl(var(--primary-dark))" }}>{applyingJob.title}</strong> · {formatCurrency(applyingJob.budget)}
+                  <strong style={{ color: "hsl(var(--primary-dark))" }}>{applyingJob.title}</strong> · {formatCurrency(convertCurrency(applyingJob.budget, applyingJob.currency, user?.currency), user?.currency || 'NGN')}
                 </p>
 
                 <div style={{ marginBottom: "1.25rem" }}>

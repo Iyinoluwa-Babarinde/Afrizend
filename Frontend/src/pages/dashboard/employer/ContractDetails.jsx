@@ -163,7 +163,7 @@ export default function ContractPage() {
           </span>
         </div>
         <p style={{ color: "hsl(var(--text-2))", fontSize: "0.875rem" }}>
-          Contractor: <strong style={{ color: "hsl(var(--text))" }}>{job.freelancerName}</strong> · Budget: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(job.budget)}</strong>
+          Contractor: <strong style={{ color: "hsl(var(--text))" }}>{job.freelancerName}</strong> · Budget: <strong style={{ color: "hsl(var(--text))" }}>{formatCurrency(job.budget, job.currency)}</strong>
         </p>
       </div>
 
