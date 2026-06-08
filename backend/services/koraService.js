@@ -145,20 +145,20 @@ async function executePayout(freelancerId, amount) {
         },
         body: JSON.stringify({
           reference: `payout-disburse-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-          amount: Number(amount),
-          currency: 'NGN',
           destination: {
             type: 'bank_account',
-            bank: {
-              bank_code: '033',
-              account_number: '0000000000'
+            amount: Math.max(Number(amount), 1000), // Enforce minimum 1000 NGN per Kora limits
+            currency: 'NGN',
+            narration: 'Afrizend Milestone Payout Settlement',
+            bank_account: {
+              bank: '033',
+              account: '0000000000'
+            },
+            customer: {
+              name: 'Afrizend Freelancer',
+              email: 'freelancer@afrizend.com'
             }
-          },
-          customer: {
-            name: 'Afrizend Freelancer',
-            email: 'freelancer@afrizend.com'
-          },
-          narration: 'Afrizend Milestone Payout Settlement'
+          }
         })
       });
 
