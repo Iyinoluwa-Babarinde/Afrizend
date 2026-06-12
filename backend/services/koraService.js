@@ -240,7 +240,7 @@ async function chargeCard(amount, currency, cardDetails, user) {
         },
         amount: Number(amount),
         currency: currency,
-        redirect_url: "http://localhost:5173/dashboard/wallet",
+        redirect_url: `${process.env.FRONTEND_URL || "http://localhost:5173"}/dashboard/wallet`,
         customer: {
           name: safeName,
           email: user.email || "user@afrizend.com"

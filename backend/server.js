@@ -791,6 +791,9 @@ app.post('/api/escrow/transfer', authenticateToken, async (req, res) => {
 
     const convertedAmount = convertCurrency(amount, employer.currency, freelancerToPay.currency);
 
+    // Trigger Kora API to actually move the money from the master account
+    await koraService.executePayout(freelancer_id, convertedAmount);
+
     await prisma.milestone.update({
       where: { id: milestone_id },
       data: { status: 'paid' }

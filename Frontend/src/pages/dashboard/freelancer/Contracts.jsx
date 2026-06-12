@@ -9,12 +9,12 @@ const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api");
 
 function MilestoneStatusIcon({ status }) {
     const s = (status || '').toUpperCase();
-    if (s === "APPROVED" || s === "PAID") return <CheckCircle size={16} color="hsl(145 65% 50%)"/>;
-    if (s === "IN_PROGRESS") return <Play size={14} color="hsl(217 91% 65%)"/>;
-    if (s === "UNDER_REVIEW" || s === "IN_REVIEW") return <Clock size={14} color="hsl(38 92% 60%)"/>;
-    if (s === "NEEDS_REVISION") return <RotateCcw size={14} color="hsl(0 84% 60%)"/>;
-    if (s === "ESCALATED") return <AlertTriangle size={14} color="hsl(38 92% 60%)"/>;
-    return <Lock size={14} color="hsl(220 15% 40%)"/>;
+    if (s === "APPROVED" || s === "PAID") return <CheckCircle size={16} color="hsl(145 65% 50%)" />;
+    if (s === "IN_PROGRESS") return <Play size={14} color="hsl(217 91% 65%)" />;
+    if (s === "UNDER_REVIEW" || s === "IN_REVIEW") return <Clock size={14} color="hsl(38 92% 60%)" />;
+    if (s === "NEEDS_REVISION") return <RotateCcw size={14} color="hsl(0 84% 60%)" />;
+    if (s === "ESCALATED") return <AlertTriangle size={14} color="hsl(38 92% 60%)" />;
+    return <Lock size={14} color="hsl(220 15% 40%)" />;
 }
 
 function MilestoneStatusLabel({ status }) {
@@ -93,15 +93,15 @@ export default function FreelancerContractsPage() {
                     <p style={{ color: "hsl(var(--text-2))", fontSize: "0.875rem", marginTop: 4 }}>Manage active projects and submit deliverables for AI verification</p>
                 </div>
                 <button onClick={loadContracts} className="btn btn-ghost btn-sm" style={{ gap: "0.4rem" }} disabled={loading}>
-                    <RefreshCw size={14} style={{ animation: loading ? "spin 1s linear infinite" : "none" }}/> Refresh
+                    <RefreshCw size={14} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} /> Refresh
                 </button>
             </div>
 
             {/* Filters */}
             <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
                 <div style={{ position: "relative", flex: 1, minWidth: 240 }}>
-                    <Search size={16} color="hsl(220 15% 50%)" style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)" }}/>
-                    <input className="input" placeholder="Search contracts..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ paddingLeft: "2.25rem" }}/>
+                    <Search size={16} color="hsl(220 15% 50%)" style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)" }} />
+                    <input className="input" placeholder="Search contracts..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ paddingLeft: "2.25rem" }} />
                 </div>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                     {["ALL", "IN_PROGRESS", "COMPLETED"].map((f) => (
@@ -163,15 +163,15 @@ export default function FreelancerContractsPage() {
                             <div style={{ background: "hsl(var(--surface-3))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "1rem" }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                        <Lock size={14} color="hsl(145 65% 50%)"/>
-                                        <span style={{ fontSize: "0.8rem", color: "hsl(var(--text))", fontWeight: 600 }}>ILP Escrow</span>
+                                        <Lock size={14} color="hsl(145 65% 50%)" />
+                                        <span style={{ fontSize: "0.8rem", color: "hsl(var(--text))", fontWeight: 600 }}>KORA Escrow</span>
                                     </div>
                                     <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--success))" }}>
                                         {formatCurrency(convertCurrency(total, job.currency, user?.currency), user?.currency || 'NGN')} Secured
                                     </span>
                                 </div>
                                 <div style={{ height: 6, background: "hsl(var(--surface-4))", borderRadius: 99, overflow: "hidden" }}>
-                                    <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, hsl(145 65% 42%), hsl(145 65% 55%))", borderRadius: 99, transition: "width 0.8s ease" }}/>
+                                    <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, hsl(145 65% 42%), hsl(145 65% 55%))", borderRadius: 99, transition: "width 0.8s ease" }} />
                                 </div>
                                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem", fontSize: "0.75rem", color: "hsl(var(--text-2))" }}>
                                     <span>{formatCurrency(convertCurrency(released, job.currency, user?.currency), user?.currency || 'NGN')} Paid to you</span>
@@ -203,11 +203,11 @@ export default function FreelancerContractsPage() {
                                                         width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                                                         background: isPaid ? "hsl(145 65% 42% / 0.15)" : isApproved ? "hsl(38 92% 60% / 0.15)" : isActive ? "hsl(217 91% 55% / 0.15)" : isRevision ? "hsl(0 84% 60% / 0.15)" : "hsl(var(--surface-4))",
                                                     }}>
-                                                        <MilestoneStatusIcon status={mStatus}/>
+                                                        <MilestoneStatusIcon status={mStatus} />
                                                     </div>
                                                     <div>
                                                         <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "hsl(var(--text))", marginBottom: 2 }}>{m.title}</div>
-                                                        <MilestoneStatusLabel status={mStatus}/>
+                                                        <MilestoneStatusLabel status={mStatus} />
                                                     </div>
                                                 </div>
 
@@ -220,23 +220,23 @@ export default function FreelancerContractsPage() {
 
                                                     {(isActive || isRevision) && (
                                                         <Link to={`/dashboard/freelancer/contracts/${job.id}/submit/${m.id}`} className="btn btn-primary btn-sm submit-milestone-btn">
-                                                            <Upload size={14}/>
+                                                            <Upload size={14} />
                                                             {isRevision ? "Resubmit" : "Submit Work"}
                                                         </Link>
                                                     )}
                                                     {isReview && (
                                                         <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.78rem", color: "hsl(38 92% 60%)" }}>
-                                                            <Shield size={13}/> AI Reviewing…
+                                                            <Shield size={13} /> AI Reviewing…
                                                         </div>
                                                     )}
                                                     {isApproved && (
                                                         <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.78rem", color: "hsl(38 92% 60%)" }}>
-                                                            <Clock size={13}/> Awaiting Employer
+                                                            <Clock size={13} /> Awaiting Employer
                                                         </div>
                                                     )}
                                                     {isPaid && (
                                                         <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.78rem", color: "hsl(var(--success))" }}>
-                                                            <Zap size={13}/> Paid
+                                                            <Zap size={13} /> Paid
                                                         </div>
                                                     )}
                                                 </div>
@@ -251,7 +251,7 @@ export default function FreelancerContractsPage() {
 
                 {!loading && filtered.length === 0 && (
                     <div className="card" style={{ textAlign: "center", padding: "3rem 1rem" }}>
-                        <FileText size={48} color="hsl(220 15% 25%)" style={{ margin: "0 auto 1rem" }}/>
+                        <FileText size={48} color="hsl(220 15% 25%)" style={{ margin: "0 auto 1rem" }} />
                         <h3 className="font-heading" style={{ fontSize: "1.1rem", color: "hsl(var(--text))", marginBottom: "0.5rem" }}>No active contracts</h3>
                         <p style={{ color: "hsl(var(--text-2))", fontSize: "0.875rem" }}>
                             Contracts appear here once an employer hires you. Apply to jobs in Opportunities to get started.

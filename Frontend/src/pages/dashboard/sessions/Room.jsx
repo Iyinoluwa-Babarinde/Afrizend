@@ -10,24 +10,24 @@ export default function SessionRoom() {
     const params = useParams();
     const navigate = useNavigate();
     const user = useAuthStore((s) => s.user);
-    
+
     const [inCall, setInCall] = useState(false);
     const [duration, setDuration] = useState(0); // in seconds
     const ratePerMinute = 1.20; // Hardcoded demo rate
     const amountEarned = (duration / 60) * ratePerMinute;
-    
+
     // WebRTC State
     const [isMuted, setIsMuted] = useState(false);
     const [isVideoOff, setIsVideoOff] = useState(false);
     const [remoteStream, setRemoteStream] = useState(null);
     const [connected, setConnected] = useState(false);
-    
+
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
     const peerConnectionRef = useRef(null);
     const localStreamRef = useRef(null);
     const socketRef = useRef(null);
-    
+
     const roomId = params.id;
 
     useEffect(() => {
@@ -51,16 +51,16 @@ export default function SessionRoom() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             localStreamRef.current = stream;
-            
+
             if (localVideoRef.current) {
                 localVideoRef.current.srcObject = stream;
             }
-            
+
             setInCall(true);
-            
+
             // Connect to Socket
             socketRef.current = io((import.meta.env.VITE_SOCKET_URL || "http://localhost:5000"));
-            
+
             socketRef.current.on('connect', () => {
                 socketRef.current.emit('join_video_room', roomId);
             });
@@ -184,7 +184,7 @@ export default function SessionRoom() {
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                             <Zap size={14} color="hsl(200 100% 65%)" className="pulse-blue" style={{ borderRadius: "50%" }} />
                             <div style={{ display: "flex", flexDirection: "column" }}>
-                                <span style={{ fontSize: "0.65rem", color: "hsl(var(--text-2))", lineHeight: 1 }}>Streaming via ILP</span>
+                                <span style={{ fontSize: "0.65rem", color: "hsl(var(--text-2))", lineHeight: 1 }}>Streaming via KORA</span>
                                 <span className="font-heading" style={{ fontSize: "1rem", fontWeight: 800, color: "hsl(200 100% 65%)", lineHeight: 1 }}>
                                     {formatCurrency(amountEarned)}
                                 </span>
@@ -203,7 +203,7 @@ export default function SessionRoom() {
                         <p style={{ color: "hsl(var(--text-2))", fontSize: "0.85rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
                             {user?.role === "employer"
                                 ? `You will pre-authorize a budget. Payment streams at ${formatCurrency(ratePerMinute)}/min while connected.`
-                                : `Payment will stream directly to your ILP wallet at ${formatCurrency(ratePerMinute)}/min.`}
+                                : `Payment will stream directly to your KORA wallet at ${formatCurrency(ratePerMinute)}/min.`}
                         </p>
                         <button className="btn btn-primary" onClick={startCall} style={{ width: "100%" }}>
                             Join & Start Streaming Payment
@@ -211,7 +211,7 @@ export default function SessionRoom() {
                     </div>
                 ) : (
                     <div style={{ width: "100%", height: "100%", maxWidth: 1000, background: "hsl(var(--surface-2))", borderRadius: 16, border: "1px solid hsl(var(--border))", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        
+
                         {/* Remote Video */}
                         {!connected ? (
                             <div style={{ textAlign: "center", zIndex: 10 }}>
@@ -219,22 +219,22 @@ export default function SessionRoom() {
                                 <div style={{ fontSize: "0.85rem", color: "hsl(var(--text-2))", marginTop: 4 }}>Waiting for others to join...</div>
                             </div>
                         ) : (
-                            <video 
+                            <video
                                 ref={remoteVideoRef}
-                                autoPlay 
-                                playsInline 
-                                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                autoPlay
+                                playsInline
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
                             />
                         )}
 
                         {/* Self view pip */}
                         <div style={{ position: "absolute", bottom: "1.5rem", right: "1.5rem", width: 240, height: 160, background: "hsl(var(--surface-3))", borderRadius: 12, border: "2px solid hsl(var(--border))", overflow: "hidden" }}>
-                            <video 
-                                ref={localVideoRef} 
-                                autoPlay 
-                                playsInline 
-                                muted 
-                                style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }} 
+                            <video
+                                ref={localVideoRef}
+                                autoPlay
+                                playsInline
+                                muted
+                                style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }}
                             />
                         </div>
                     </div>

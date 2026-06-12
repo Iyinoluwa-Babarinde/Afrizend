@@ -70,7 +70,7 @@ export default function EmployerContractsPage() {
                     }
                 });
             })
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => setLoading(false));
     }, [user?.id]);
 
@@ -148,7 +148,7 @@ export default function EmployerContractsPage() {
                                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                                             <Lock size={13} color="hsl(145 65% 50%)" />
-                                            <span style={{ fontSize: "0.8rem", color: "hsl(var(--text))", fontWeight: 600 }}>ILP Escrow</span>
+                                            <span style={{ fontSize: "0.8rem", color: "hsl(var(--text))", fontWeight: 600 }}>KORA Escrow</span>
                                         </div>
                                         <span style={{ fontSize: "0.78rem", color: "hsl(var(--success))", fontWeight: 600 }}>{pct}% released</span>
                                     </div>

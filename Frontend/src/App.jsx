@@ -61,56 +61,56 @@ import Chat from './pages/dashboard/Chat';
 import Room from './pages/dashboard/sessions/Room';
 
 function App() {
-    const navigate = useNavigate();
-    const fetchMe = useAuthStore(s => s.fetchMe);
+  const navigate = useNavigate();
+  const fetchMe = useAuthStore(s => s.fetchMe);
 
-    useEffect(() => {
-        fetchMe();
-    }, [fetchMe]);
+  useEffect(() => {
+    fetchMe();
+  }, [fetchMe]);
 
-    // Expose navigate globally for the AutoDemo script
-    if (typeof window !== 'undefined') {
-      window.routerNavigate = navigate;
-    }
+  // Expose navigate globally for the AutoDemo script
+  if (typeof window !== 'undefined') {
+    window.routerNavigate = navigate;
+  }
 
-    return (<>
-      <AutoDemo />
-      <Helmet>
-        <title>Afrizend.</title>
-        <meta name="description" content="AI-powered global talent marketplace with ILP-native cross-border payments. Work first, get paid automatically. No invoices. No ghosting. No banks."/>
-      </Helmet>
+  return (<>
+    <AutoDemo />
+    <Helmet>
+      <title>Afrizend.</title>
+      <meta name="description" content="AI-powered global talent marketplace with KORA-native cross-border payments. Work first, get paid automatically. No invoices. No ghosting. No banks." />
+    </Helmet>
 
-      <ErrorBoundary>
-        <Routes>
-          <Route element={<RootLayout />}>
-            <Route path="/" element={<LandingPage />}/>
-            <Route path="/auth/login" element={<Login />}/>
-            <Route path="/auth/register" element={<Register />}/>
-            
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard/employer" element={<EmployerOverview />}/>
-              <Route path="/dashboard/employer/jobs" element={<EmployerJobs />}/>
-              <Route path="/dashboard/employer/jobs/new" element={<EmployerNewJob />}/>
-              <Route path="/dashboard/employer/contracts" element={<EmployerContracts />}/>
-              <Route path="/dashboard/employer/jobs/:id/contract" element={<EmployerContractDetails />}/>
-              <Route path="/dashboard/employer/jobs/:id/matches" element={<EmployerMatches />}/>
-              <Route path="/dashboard/employer/network" element={<EmployerNetwork />}/>
-              <Route path="/dashboard/employer/sessions" element={<EmployerSessions />}/>
-              <Route path="/dashboard/employer/settings" element={<EmployerSettings />}/>
+    <ErrorBoundary>
+      <Routes>
+        <Route element={<RootLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/register" element={<Register />} />
 
-              <Route path="/dashboard/freelancer" element={<FreelancerOverview />}/>
-              <Route path="/dashboard/freelancer/contracts" element={<FreelancerContracts />}/>
-              <Route path="/dashboard/freelancer/contracts/:id/submit/:milestoneId" element={<FreelancerSubmitMilestone />}/>
-              <Route path="/dashboard/freelancer/opportunities" element={<FreelancerOpportunities />}/>
-              <Route path="/dashboard/freelancer/sessions" element={<FreelancerSessions />}/>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard/employer" element={<EmployerOverview />} />
+            <Route path="/dashboard/employer/jobs" element={<EmployerJobs />} />
+            <Route path="/dashboard/employer/jobs/new" element={<EmployerNewJob />} />
+            <Route path="/dashboard/employer/contracts" element={<EmployerContracts />} />
+            <Route path="/dashboard/employer/jobs/:id/contract" element={<EmployerContractDetails />} />
+            <Route path="/dashboard/employer/jobs/:id/matches" element={<EmployerMatches />} />
+            <Route path="/dashboard/employer/network" element={<EmployerNetwork />} />
+            <Route path="/dashboard/employer/sessions" element={<EmployerSessions />} />
+            <Route path="/dashboard/employer/settings" element={<EmployerSettings />} />
 
-              <Route path="/dashboard/wallet" element={<Wallet />}/>
-              <Route path="/dashboard/chat" element={<Chat />}/>
-              <Route path="/dashboard/sessions/room/:id" element={<Room />}/>
-            </Route>
+            <Route path="/dashboard/freelancer" element={<FreelancerOverview />} />
+            <Route path="/dashboard/freelancer/contracts" element={<FreelancerContracts />} />
+            <Route path="/dashboard/freelancer/contracts/:id/submit/:milestoneId" element={<FreelancerSubmitMilestone />} />
+            <Route path="/dashboard/freelancer/opportunities" element={<FreelancerOpportunities />} />
+            <Route path="/dashboard/freelancer/sessions" element={<FreelancerSessions />} />
+
+            <Route path="/dashboard/wallet" element={<Wallet />} />
+            <Route path="/dashboard/chat" element={<Chat />} />
+            <Route path="/dashboard/sessions/room/:id" element={<Room />} />
           </Route>
-        </Routes>
-      </ErrorBoundary>
-    </>);
+        </Route>
+      </Routes>
+    </ErrorBoundary>
+  </>);
 }
 export default App;

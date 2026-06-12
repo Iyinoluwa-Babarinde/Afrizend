@@ -4,13 +4,13 @@
 
 const demoScript = [
   { type: 'wait', ms: 1000 },
-  
+
   // 1. Landing Page -> Login
   { type: 'navigate', path: '/' },
   { type: 'wait', ms: 1000 },
   { type: 'click', selector: 'a[href="/auth/login"]' },
   { type: 'wait', ms: 1000 },
-  
+
   // 2. Login as Employer
   { type: 'click', selector: '#role-employer' },
   { type: 'wait', ms: 500 },
@@ -18,7 +18,7 @@ const demoScript = [
   { type: 'type', selector: 'input[type="password"]', text: 'password123' },
   { type: 'click', selector: 'button[type="submit"]' },
   { type: 'wait', ms: 2000 },
-  
+
   // 3. Navigate to create job
   { type: 'click', selector: 'a[href="/dashboard/employer/jobs/new"]' },
   { type: 'wait', ms: 1000 },
@@ -38,14 +38,14 @@ const demoScript = [
   // 4. Matches
   { type: 'click', selector: '.ai-match-card:first-child .hire-btn' },
   { type: 'wait', ms: 1500 },
-  
+
   // 5. Chat & Escrow
   { type: 'type', selector: '#chat-input', text: 'Hi! Let us lock the terms. $5000 for the MVP.' },
   { type: 'click', selector: '#send-msg-btn' },
   { type: 'wait', ms: 1500 },
   { type: 'click', selector: '#lock-escrow-btn' },
-  { type: 'wait', ms: 3000 }, // Wait for ILP escrow API
-  
+  { type: 'wait', ms: 3000 }, // Wait for KORA escrow API
+
   // 6. Switch to Freelancer & Submit (Simulated via navigation for demo)
   { type: 'navigate', path: '/dashboard/freelancer/contracts' },
   { type: 'wait', ms: 1500 },
@@ -60,7 +60,7 @@ const demoScript = [
   { type: 'wait', ms: 1500 },
   { type: 'click', selector: '.review-submission-btn' },
   { type: 'wait', ms: 2000 }, // Read AI report
-  
+
   // The script stops here so the employer can manually click "Approve & Release"
 ];
 
