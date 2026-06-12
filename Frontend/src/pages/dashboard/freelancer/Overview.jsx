@@ -17,10 +17,6 @@ export default function FreelancerDashboard() {
   return (<div style={{ padding: "1.5rem", maxWidth: 1100, margin: "0 auto" }}>
     {/* Header */}
     <div style={{ marginBottom: "1.75rem" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-        <div className="status-dot online" />
-        <span style={{ fontSize: "0.78rem", color: "hsl(var(--success))", fontWeight: 600 }}>KORA Network Connected</span>
-      </div>
       <h1 className="font-heading" style={{ fontSize: "1.75rem", fontWeight: 800, color: "hsl(var(--text))", letterSpacing: "-0.03em" }}>
         Good afternoon, {user?.name?.split(" ")[0]} 👋
       </h1>

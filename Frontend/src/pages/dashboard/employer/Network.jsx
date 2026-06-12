@@ -259,7 +259,7 @@ export default function EmployerNetwork() {
       {/* Messages */}
       <div style={{ flex: 1, padding: "1.25rem", overflowY: "auto", display: "flex", flexDirection: "column", gap: "1rem" }}>
         <div style={{ alignSelf: "center", textAlign: "center", fontSize: "0.72rem", color: "hsl(var(--text-3))", background: "hsl(var(--surface-3))", padding: "0.3rem 0.6rem", borderRadius: 4, margin: "0 auto" }}>
-          Secure Chat via Interledger Protocol (KORA)
+          Secure Chat via Kora Network
         </div>
 
         {(chatHistory[chatConsultant.id] || [

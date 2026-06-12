@@ -143,15 +143,6 @@ export default function DashboardLayout() {
                 </Link>
             </nav>
 
-            {/* Network indicator */}
-            <div style={{ margin: "0 0.75rem 0.75rem", background: "hsl(var(--success) / 0.1)", border: "1px solid hsl(var(--success) / 0.2)", borderRadius: 8, padding: "0.625rem 0.75rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.25rem" }}>
-                    <div className="status-dot online" style={{ width: 6, height: 6 }} />
-                    <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "hsl(var(--success))", textTransform: "uppercase", letterSpacing: "0.06em" }}>Kora Network Active</span>
-                </div>
-                {user.walletAddress && <div style={{ fontSize: "0.68rem", color: "hsl(var(--text-3))", fontFamily: "monospace", fontWeight: 600 }}>{user.walletAddress}</div>}
-            </div>
-
             {/* Logout */}
             <div style={{ borderTop: "1px solid hsl(var(--border))", padding: "0.75rem" }}>
                 <button onClick={handleLogout} style={{

@@ -348,7 +348,7 @@ export default function ContractPage() {
         <div>
           <h3 className="font-heading" style={{ fontSize: "1.1rem", fontWeight: 700, color: "hsl(var(--text))", marginBottom: "0.5rem" }}>Escrow Funding</h3>
           <p style={{ color: "hsl(var(--text-2))", fontSize: "0.82rem", lineHeight: 1.5, marginBottom: "1rem" }}>
-            Pre-authorize and lock project budget into KORA (Interledger Protocol) escrow contract. The contractor will see the funds are secured before starting work.
+            Pre-authorize and lock project budget into KORA escrow contract. The contractor will see the funds are secured before starting work.
           </p>
         </div>
         {job.escrow.status === "PENDING" ? (

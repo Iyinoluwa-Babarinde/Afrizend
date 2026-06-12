@@ -10,7 +10,7 @@ export default function EmployerSettings() {
   const [profileName, setProfileName] = useState(user?.name || "Sarah Chen");
   const [companyName, setCompanyName] = useState("Acme Labs");
   const [emailAddress, setEmailAddress] = useState("sarah@acmelabs.io");
-  const [walletPointer, setWalletPointer] = useState(user?.walletAddress || "$KORA.interledger-test.dev/sarah");
+  const [walletPointer, setWalletPointer] = useState(user?.walletAddress || "0123456789");
   const [isSaved, setIsSaved] = useState(false);
   const [fundAmount, setFundAmount] = useState("");
   const [showFundModal, setShowFundModal] = useState(false);
@@ -109,7 +109,7 @@ export default function EmployerSettings() {
         {activeTab === "payments" && (<div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div>
             <h2 className="font-heading" style={{ fontSize: "1.2rem", color: "hsl(var(--text))", marginBottom: "0.5rem" }}>Payments & Escrow</h2>
-            <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))" }}>Configure your Interledger Protocol wallet pointer and manage funded employer deposits.</p>
+            <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))" }}>Configure your Virtual Bank Account and manage funded employer deposits.</p>
           </div>
 
           {/* Wallet Info Card */}
@@ -134,14 +134,14 @@ export default function EmployerSettings() {
           {/* Wallet Pointer input */}
           <form onSubmit={handleSaveProfile} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>KORA Payment Pointer</label>
+              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.4rem" }}>Kora Virtual Account Number</label>
               <input className="input" value={walletPointer} onChange={e => setWalletPointer(e.target.value)} required />
               <p style={{ fontSize: "0.72rem", color: "hsl(var(--text-3))", marginTop: "0.35rem" }}>
-                Funds from contract closures will be settled directly to this pointer address.
+                Funds from contract closures will be settled directly to this account.
               </p>
             </div>
             <div>
-              <button type="submit" className="btn btn-outline btn-sm">Update Pointer</button>
+              <button type="submit" className="btn btn-outline btn-sm">Update Account</button>
             </div>
           </form>
         </div>)}

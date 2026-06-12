@@ -23,7 +23,7 @@ const demoScript = [
   { type: 'click', selector: 'a[href="/dashboard/employer/jobs/new"]' },
   { type: 'wait', ms: 1000 },
   { type: 'type', selector: '#job-title', text: 'Senior React Engineer for Defi Dashboard' },
-  { type: 'type', selector: '#job-description', text: 'Build a decentralized dashboard using React and Tailwind. Must connect to Interledger testnet for Escrow logic.' },
+  { type: 'type', selector: '#job-description', text: 'Build a decentralized dashboard using React and Tailwind. Must connect to Kora sandbox for Escrow logic.' },
   { type: 'type', selector: '#job-budget', text: '5000' },
   { type: 'type', selector: '#job-skills', text: 'React' },
   { type: 'click', selector: '#add-skill-btn' },
