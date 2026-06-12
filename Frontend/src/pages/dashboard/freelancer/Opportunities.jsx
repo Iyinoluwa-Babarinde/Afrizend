@@ -231,12 +231,12 @@ export default function FreelancerOpportunitiesPage() {
 
                 <div style={{ marginBottom: "1.25rem" }}>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "hsl(var(--text-2))", marginBottom: "0.5rem" }}>
-                    Cover Note <span style={{ fontWeight: 400, color: "hsl(var(--text-3))" }}>(optional)</span>
+                    Portfolio Link / Cover Note <span style={{ fontWeight: 400, color: "hsl(var(--text-3))" }}>(optional)</span>
                   </label>
                   <textarea
                     className="input"
                     rows={4}
-                    placeholder="Briefly explain why you're a great fit. Mention relevant experience, tools you use, and your approach..."
+                    placeholder="Submit your portfolio (e.g., portfolio website URL, GitHub, Behance link) or cover note..."
                     value={coverNote}
                     onChange={e => setCoverNote(e.target.value)}
                     style={{ resize: "vertical", lineHeight: 1.6 }}

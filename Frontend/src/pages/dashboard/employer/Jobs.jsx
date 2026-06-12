@@ -8,6 +8,30 @@ import { Plus, Search, Briefcase, Cpu, Lock, Users, X, CheckCircle, Loader2, Sta
 
 const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api");
 
+function formatTextWithLinks(text) {
+    if (!text) return "";
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, index) => {
+        if (part.match(urlRegex)) {
+            const href = part.startsWith("http") ? part : `https://${part}`;
+            return (
+                <a
+                    key={index}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "hsl(217 91% 70%)", textDecoration: "underline", wordBreak: "break-all" }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {part}
+                </a>
+            );
+        }
+        return part;
+    });
+}
+
 export default function EmployerJobsPage() {
     const user = useAuthStore((s) => s.user);
     const acceptApplicant = useAuthStore((s) => s.acceptApplicant);
@@ -294,7 +318,7 @@ export default function EmployerJobsPage() {
                       </div>
                       {app.cover_note && (
                         <p style={{ fontSize: "0.8rem", color: "hsl(var(--text-2))", lineHeight: 1.5, marginBottom: "0.5rem" }}>
-                          "{app.cover_note}"
+                          "{formatTextWithLinks(app.cover_note)}"
                         </p>
                       )}
                       <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
